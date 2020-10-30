@@ -28,20 +28,21 @@ p{
 	margin:10px;
 }
 header{
-	background-color:#999; /*TODO: find a cool color for the header*/
+	background-color: #EEE; /*TODO: find a cool color for the header*/
 	position:relative;
 	display:flex;
 	justify-content:space-between;
 	align-items:center;
 	box-shadow: 0px 1px 2px 0px #333;
+	flex-direction: column;
 }
 header *{
-	color:white;
+	color: #000;
 	font-size: 20px;
 }
 nav{
 	display:flex;
-	justify-content: flex-end;
+	justify-content: space-around;
 	width:80%;
 	position:relative;
 }
@@ -51,11 +52,12 @@ nav > a{
 	padding-bottom:1.5%;
 	padding-right:10px;
 	padding-left: 10px;
-	color:white;
+	color: #000;
 }
 nav > a:hover{
-	background-color:#512DA8; /*Same here: cool color needed */
-	color:white;
+	background-color: #DDD; /*Same here: cool color needed */
+	cursor: pointer;
+	color: #000;
 }
 a{
 	text-decoration: none;
@@ -111,4 +113,3 @@ textarea{
 	padding:10px;
 	margin-bottom:10px;
 }
-
