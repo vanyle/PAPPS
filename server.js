@@ -11,6 +11,11 @@ try{
 let express = require('express');
 let app = express();
 
+function handle_query(req,res){
+
+}
+
+
 
 // TODO: add auth stuff somewhere around here.
 app.use('/',express.static('client'));
@@ -18,8 +23,8 @@ app.get('/',(req,res) => {
 	res.sendFile(__dirname + "/client/index.html");
 });
 
-app.get('/file',async (req,res) => {
-	fm.handle_query(req,res);
+app.get('/q',async (req,res) => {
+	handle_query(req,res);
 });
 
 app.listen(config.port);

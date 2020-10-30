@@ -1,0 +1,17 @@
+{
+	"name": "PAPS-App",
+	"description": "Le site web du PAPS",
+	"version": "0.0.1",
+	"repository": "github:vanyle/PAPPS",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"express": "^4.17.0"
+	},
+	"engines": {
+		"node": ">= 6.0.0",
+		"npm": ">= 3.0.0"
+	}
+}
