@@ -9,7 +9,14 @@ try{
 }
 
 let express = require('express');
+let cp = require('child_process');
 let app = express();
+
+/*try{
+	cp.exec("mongod --dbpath=/data");
+}catch(err){
+
+}*/
 
 function handle_query(req,res){
 

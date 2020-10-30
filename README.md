@@ -38,6 +38,9 @@ Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fou
         {
             "title":"string",
             "tags":["beef","pork"],
+            "ingredients":["beef","pork"],
+            "pre_time":30 // in minutes
+            "cook_time":20 // in minutes
             "content":"HTML data to display"
         }
     ]
