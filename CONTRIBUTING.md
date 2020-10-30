@@ -4,7 +4,7 @@ Les conventions écrites ici sont des **indications**. Ce qui compte est la simp
 
 ## Git
 
-Lorsque vous contribuez du code, utiliser la fonction `Pull Request` pour que je puisse m'assurer que le code contribué est de bonne qualité. Aussi, dans vos commits, n'incluez pas des fichiers qui ne sont pas du code ou de la documentation. En particulier, le exécutable `.exe` et les fichiers télécharger par `data_fetcher` ne doivent pas se trouver dans vos commit. Vous pouvez modifier `.gitignore` si nécessaire pour que ce soit bien le cas. Vous pouvez cependant commit des fichiers qui sont utile pour que votre éditeur de texte ou IDE fonctionne correctement.
+Lorsque vous contribuez du code, utiliser la fonction `Pull Request` pour que je puisse m'assurer que le code contribué est de bonne qualité. Aussi, dans vos commits, n'incluez pas des fichiers qui ne sont pas du code ou de la documentation. En particulier, le dossier `node_modules` ne devrait pas faire partie de vos commits. Vous pouvez modifier `.gitignore` si nécessaire pour que ce soit bien le cas. Vous pouvez cependant commit des fichiers qui sont utile pour que votre éditeur de texte ou IDE fonctionne correctement.
 
 ## Langue
 
