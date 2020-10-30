@@ -1,4 +1,5 @@
 {
 	"port":8080,
-	"host":"localhost"
+	"host":"localhost",
+	"db":"./db/database.db"
 }
