@@ -79,7 +79,7 @@ Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des 
 
 Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données. Voici le schéma de donnée
 
-```json
+```js
 {
     "recipes":[
         {
