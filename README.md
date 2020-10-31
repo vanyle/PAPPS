@@ -15,6 +15,21 @@ Elle se lance en faisant `npm start` ou `node server.js`
 
 ## Installation
 
+### Node
+
+Si Node n'est pas installé, on commence par l'installer avec ces commandes (Pour Ubuntu)
+
+```sh
+sudo apt-get install nodejs
+sudo apt-get install npm
+```
+
+Sur Windows, Node est disponible ici: https://nodejs.org/en/
+
+Pour savoir si Node est installé, entrez la commande `npm -v` dans un terminal. Si elle affiche une version, c'est que Node marche.
+
+### PAPPS
+
 On commence par télécharger le projet et installer les libraries requises par node:
 
 ```
@@ -25,7 +40,7 @@ npm install
 
 Ensuite, il faut installer la base de donner "mongodb".
 
- Utilisez ces instructions pour installer la base de donnée sur Ubuntu: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+Utilisez ces instructions pour installer la base de donnée sur Ubuntu: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 ### Pour Ubuntu 20.04
 
