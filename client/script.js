@@ -51,6 +51,19 @@ function displayRecipeCard(title, description, image, rating = 0) {
 }
 
 
+async function loadRecipeList() {
+	let content = await get_website("/q?type=recipes");
+
+	let recipeList = JSON.parse(content);
+
+	//show recipes
+	recipeList.forEach((recipe, i) => {
+		displayRecipeCard(recipe.title, "Une description de la recette","media/paps.png",recipe.rating/5);
+	});
+
+}
+
+
 
 // If you need to put color in the console.
 // This can be used for cool login functions or to indicate to the user that he should not copy paste anything here.
@@ -77,4 +90,6 @@ function displayRecipeCard(title, description, image, rating = 0) {
 	}else{
 		displaySection("home");
 	}
+
+	loadRecipeList();
 })();

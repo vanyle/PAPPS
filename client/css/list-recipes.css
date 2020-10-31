@@ -4,6 +4,8 @@
   border: 1px solid #EEE;
   display: flex;
   transition: 500ms;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .list-card:hover {
@@ -23,6 +25,7 @@
   flex-direction: column;
   padding-top: 10px;
   padding-bottom: 10px;
+  width: 100%;
 }
 
 .list-recipe-info-top {
