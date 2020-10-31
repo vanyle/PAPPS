@@ -30,6 +30,26 @@ function displaySection(section_name){
 }
 
 
+function titleToID(title) {
+        return title.replace("/ /g","-");
+}
+
+function displayRecipeCard(title, description, image, rating = 0) {
+        var id = titleToID(title);
+        var elemHTML = '<div class="list-card" id="' + id + '"> <img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/> <div class="list-recipe-info-container"> <div class="list-recipe-info-top"> <h3 class="list-recipe-title">' + title + '</h3> <div class="sc"> </div> </div><p class="list-recipe-description">' + description + '</p> </div> </div>';
+        var list_cont = document.querySelector("#recipe-list-container");
+        var inn = list_cont.innerHTML;
+        inn += elemHTML;
+        list_cont.innerHTML = inn;
+
+        var elem = document.getElementById(id);
+        var starContainer = elem.querySelector(".sc");
+        var SR = new StarRating(starContainer, rating);
+        SR.setRating(rating);
+        return SR;
+
+}
+
 
 
 // If you need to put color in the console.
