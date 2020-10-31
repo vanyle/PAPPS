@@ -110,7 +110,13 @@ module.exports.setup = (c) => {
 			mongo_client = client;
 			db = mongo_client.db(DB_NAME);
 
-			const recipes = db.collection('recipes');
+			if(config.put_fake_data){
+				console.log(YELLOW_COLOR_CODE+"Overriding database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
+				console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
+				setTimeout( () => {
+					require('../doc/fake_data.js').populate_db(db);
+				},5 * 1000);
+			}
 
 			/*const recipe = {
 				title:"Frites",
@@ -140,8 +146,22 @@ module.exports.setup = (c) => {
 };
 
 
-
+function send_error(res,msg){
+	res.send({'error':msg});
+}
 
 module.exports.handle_query = (req,res) => {
+	if(db == null){
+		send_error(res,"database not ready. Please wait a bit.");
+		return;
+	}
 
+	if(req.query.type === "recipes"){
+		const recipes = db.collection('recipes');
+		recipes.find({}).toArray(function(err, docs) {
+			res.send(docs);
+		});
+	}else{
+		send_error(res,"type option not recognized");
+	}
 }

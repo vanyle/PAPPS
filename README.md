@@ -77,21 +77,16 @@ Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des 
 
 ## Structure du back-end
 
-Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données. Voici le schéma de donnée
+Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données.
 
-```js
-{
-    "recipes":[
-        {
-            "title":"string",
-            "tags":["beef","pork"],
-            "ingredients":["beef","pork"],
-            "pre_time":30 // in minutes
-            "cook_time":20 // in minutes
-            "content":"HTML data to display"
-        }
-    ]
-}
-```
+Le schéma de donnée est décrit dans `./doc/fake_data.js` qui permet aussi de peupler la base de donnée avec des données fictives pour tester l'interface. (changer la configuration pour activer les données fictives.)
 
-(En cours de rédaction)
+### Listes des end-points (susceptible de changer.)
+
+`/q?type=recipes`
+
+Renvoie la liste de toutes les recettes publiques du site au format JSON.
+
+`/q?type=users`
+
+Renvoie la liste de tous les utilisateurs publiques du site au format JSON (non implémenté pour l'instant)

@@ -6,5 +6,7 @@
 	"mongo_host":"127.0.0.1",
 	"mongo_program":"mongod",
 	"db_path":"./db/",
-	"https_secret":"./secret/"
+	"https_secret":"./secret/",
+
+	"put_fake_data":false
 }
