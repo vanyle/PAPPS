@@ -58,7 +58,7 @@ async function loadRecipeList() {
 
 	//show recipes
 	recipeList.forEach((recipe, i) => {
-		displayRecipeCard(recipe.title, "Une description de la recette","media/paps.png",recipe.rating/5);
+		displayRecipeCard(recipe.title, recipe.description,"media/paps.png",recipe.rating/5);
 	});
 
 }
