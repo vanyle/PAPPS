@@ -38,6 +38,9 @@ app.get('/',(req,res) => {
 app.get('/q',async (req,res) => {
 	database.handle_query(req,res);
 });
+app.post('/q',async (req,res) => {
+	database.handle_post_query(req,res);
+});
 
 
 const RED_COLOR_CODE = "\u001b[31m";

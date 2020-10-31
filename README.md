@@ -92,16 +92,19 @@ Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des 
 
 ## Structure du back-end
 
-Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données.
+Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée RethinkDB qui se base sur une structure JSON pour stocker les données. Plus d'info ici: https://rethinkdb.com/
 
 Le schéma de donnée est décrit dans `./doc/fake_data.js` qui permet aussi de peupler la base de donnée avec des données fictives pour tester l'interface. (changer la configuration pour activer les données fictives.)
 
 ### Listes des end-points (susceptible de changer.)
 
-`/q?type=recipes`
+GET `/q?type=recipes`
 
 Renvoie la liste de toutes les recettes publiques du site au format JSON.
 
-`/q?type=users`
+GET `/q?type=users`
 
 Renvoie la liste de tous les utilisateurs publiques du site au format JSON (non implémenté pour l'instant)
+
+N'importe quel end-point est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
+

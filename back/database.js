@@ -3,6 +3,7 @@ const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const rethinkdb = require('rethinkdb');
+const rw = require('./rethink_wrapper.js');
 
 let db_host = null; // config load is needed to init these
 let db_port = null;
@@ -139,14 +140,6 @@ function send_error(res,msg){
 	res.send({'error':msg});
 }
 
-async function listTable(conn,r){
-	return new Promise((resolve) => {
-		r.tableList().run(conn, (err,result) => {
-			resolve({err:err,result:result});
-		});
-	});
-}
-
 module.exports.handle_query = async (req,res) => {
 	if(db_client === null){
 		send_error(res,"database not ready. Please wait a bit.");
@@ -154,24 +147,16 @@ module.exports.handle_query = async (req,res) => {
 	}
 
 	if(req.query.type === "recipes"){
-
-		//let tablesInfo = await listTable(db_client,rethinkdb);
-		//console.log(tablesInfo.result);
-
-		rethinkdb.table('recipes').run(db_client, function(err, cursor) {
-		    if (err) throw err; // todo: handle this better than just throwing
-
-		    cursor.toArray(function(err, result) {
-		        if (err){
-		        	console.log("An error occured while processing the query: "+req.url);
-		        	console.log(err.message);
-		        	res.send([]);
-		        	return;
-		        }
-		        res.send(result);
-		    });
-		});
+		let result = await rw.get(null,'recipes',db_client,rethinkdb);
+		if(result.error){
+			send_error(res,"unable to retreive recipes");
+		}else{
+			res.send(result.result);
+		}
 	}else{
 		send_error(res,"type option not recognized");
 	}
+}
+module.exports.handle_post_query = async (req,res) => {
+
 }

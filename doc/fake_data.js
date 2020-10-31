@@ -1,49 +1,15 @@
 // This file contains some fake data to populate the database.
 // It is also used as documentation for what the database looks like.
 
-async function createTable(tableName,conn,r){
-	return new Promise((resolve) => {
-		r.tableCreate(tableName).run(conn, function(err, result) {
-	    	resolve({err:err,result:result});
-		});
-	});
-}
-async function deleteTable(tableName,conn,r){
-	return new Promise((resolve) => {
-		r.tableDrop(tableName).run(conn, function(err, result) {
-	    	resolve({err:err,result:result});
-		});
-	});
-}
-async function listTable(conn,r){
-	return new Promise((resolve) => {
-		r.tableList().run(conn, (err,result) => {
-			resolve({err:err,result:result});
-		});
-	});
-}
-async function insertOne(data,tableName,conn,r){
-	return new Promise((resolve) => {
-		r.table(tableName).insert(data).run(conn, function(err, result) {
-	    	resolve({err:err,result:result});
-		});
-	});
-}
-async function getAll(query,tableName,conn,r){
-	return new Promise((resolve) => {
-		r.table(tableName).getAll(data.keys,data.indices).run(conn, function(err, result) {
-	    	resolve({err:err,result:result});
-		});
-	});
-}
+let rw = require('../back/rethink_wrapper.js');
 
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (conn,r) => {
 
 	// --------------------------------------------------
 	// recipes related
-	await deleteTable("recipes",conn,r); // ignore errors if the table does not exist, this is a setup function
-	await createTable("recipes",conn,r);
+	await rw.deleteTable("recipes",conn,r); // ignore errors if the table does not exist, this is a setup function
+	await rw.createTable("recipes",conn,r);
 
 
 	const recipe1 = {
@@ -65,7 +31,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await insertOne(recipe1,"recipes",conn,r);
+	await rw.insert(recipe1,"recipes",conn,r);
 
 	const recipe2 = {
 		recipeid:1,
@@ -86,13 +52,13 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await insertOne(recipe2,"recipes",conn,r);
+	await rw.insert(recipe2,"recipes",conn,r);
 
 
 	// ----------------------------------------------------------
 	// user related
-	await deleteTable("users",conn,r);
-	await createTable("users",conn,r);
+	await rw.deleteTable("users",conn,r);
+	await rw.createTable("users",conn,r);
 
 	const user1 = {
 		userid:0,
@@ -117,7 +83,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await insertOne(user1,"users",conn,r);
+	await rw.insertOne(user1,"users",conn,r);
 
 	const user2 = {
 		userid:0,
@@ -134,7 +100,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await insertOne(user2,"users",conn,r);
+	await rw.insertOne(user2,"users",conn,r);
 
 	// More tables will be required based on the features we'll need.
 
