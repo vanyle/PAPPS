@@ -9,11 +9,58 @@ Liser ce fichier avant de contribuer, il contient des bonnes pratiques à suivre
 
 L'application est construire avec NodeJS et Express. Le back-end communique avec le front-end avec Ajax par le end-point `/q`
 
+Elle utilise une base de donnée "mongodb" que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config.
+
 Elle se lance en faisant `npm start` ou `node server.js`
 
-Elle utilise une base de donnée "mongodb" que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config. Utilisez ces instructions pour installer la base de donnée: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+## Installation
 
-TODO: faire un script npm qui installe automatiquement mongodb pour faire un déployement avec seulement `npm install`
+On commence par télécharger le projet et installer les libraries requises par node:
+
+```
+git clone https://github.com/vanyle/PAPPS/
+cd PAPPS
+npm install
+```
+
+Ensuite, il faut installer la base de donner "mongodb".
+
+ Utilisez ces instructions pour installer la base de donnée sur Ubuntu: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+### Pour Ubuntu 20.04
+
+```sh
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+```
+
+### Pour Windows
+
+Télécharger le "MongoDB Community Server" depuis le site: https://www.mongodb.com/try/download/community Sélectionnez bien Windows, la version 4.4.1 (ou supérieur) et msi pour le type de paquet.
+
+Lancer l'exécutable et suivez les étapes d'installation. Lorsque vous avez fini, ajouter dans votre PATH le chemin vers l'exécutable "mongod.exe". Si vous ne voulez pas modifier votre PATH, ajoutez dans le fichier de configuration le chemin vers l'exécutable dans l'option mongo_program. Par exemple, pour mon installation:
+
+```js
+{
+    // ...
+    "mongo_program":"D:/MongoDB/Server/4.4/bin/mongod.exe", // remplacer ce chemin par celui ou vous avez installer la base de donnée
+    // ...
+}
+```
+
+## Faire marcher le HTTPS
+
+Par défaut, le site utilise HTTP. Si vous le lancer, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
+
+Pour faire marcher le HTTPS, il faut faire exactement ça, mettre les clefs HTTPS dans le dossier secret, qui devra alors ressembler à ça:
+
+![contenu_du_dossier_secret](./doc/1.png)
+
+Vous pouvez alors lancer le serveur et le https marchera. Pour obtenir les clefs HTTPS, suivez le tutoriel de Viarezo avec Let's Encrypt et certbot. Celui-ci stocke les clefs dans `/etc/letsencrypt/live/` habituellement.
+
+Alternativement, vous pouvez changer la valeur de `https_secret` dans la config pour mettre le chemin vers vos clef (`/etc/letsencrypt/live/nom_du_site` en général si vous utilisez certbot)
 
 ## Structure du front-end
 
@@ -30,18 +77,16 @@ Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des 
 
 ## Structure du back-end
 
-Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données. Voici le schéma de donnée
+Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée mongodb qui se base sur une structure JSON pour stocker les données.
 
-```json
-{
-    "recipes":[
-        {
-            "title":"string",
-            "tags":["beef","pork"],
-            "content":"HTML data to display"
-        }
-    ]
-}
-```
+Le schéma de donnée est décrit dans `./doc/fake_data.js` qui permet aussi de peupler la base de donnée avec des données fictives pour tester l'interface. (changer la configuration pour activer les données fictives.)
 
-(En cours de rédaction)
+### Listes des end-points (susceptible de changer.)
+
+`/q?type=recipes`
+
+Renvoie la liste de toutes les recettes publiques du site au format JSON.
+
+`/q?type=users`
+
+Renvoie la liste de tous les utilisateurs publiques du site au format JSON (non implémenté pour l'instant)
