@@ -9,6 +9,7 @@ let db_port = null;
 let config = {};
 let db_process = null;
 let db_client = null;
+let client_started = false;
 
 let json_logs = false; // mongod uses JSON logs with version >= 4.4
 
@@ -22,11 +23,33 @@ const RESET_COLOR_CODE = "\u001b[0m";
 function manage_shutdown(){
 	console.log("Shutting down database.");
 	// The server is about to be shutdown, cleanly shutdown the database also to prevent data corruption
-	db_client.close();
+	// Nothing do to :) (the process is a child and gets a clean error code.)
 }
 
 function process_logs_from_database(data){
 	console.log("[RethingDB]",data);
+}
+
+function start_db_client(){
+	client_started = true;
+	// connect to db.
+	rethinkdb.connect({host: db_host, port: db_port}, async (err, connection) => {
+		if(err !== null){
+			console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
+			console.log(err.message);
+			process.exit(1);
+		}
+		console.log(GREEN_COLOR_CODE+"Connected successfully to the database at "+db_host+":"+db_port+RESET_COLOR_CODE);
+		db_client = connection;
+
+		if(config.put_fake_data){
+			console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
+			console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
+			setTimeout( () => {
+				require('../doc/fake_data.js').populate_db(connection,rethinkdb);
+			},5 * 1000);
+		}
+	});
 }
 
 module.exports.setup = (c) => {
@@ -85,6 +108,9 @@ module.exports.setup = (c) => {
 				if(data[i] == '\n'){
 					// process the logs and flush the buffer
 					process_logs_from_database(databuffer);
+					if(databuffer.indexOf("Listening on driver address" != -1) && !client_started){
+						start_db_client();
+					}
 					databuffer = "";
 				}else{
 					databuffer += data[i];
@@ -104,25 +130,6 @@ module.exports.setup = (c) => {
 		process.on('SIGTERM',manage_shutdown);
 
 		console.log(GREEN_COLOR_CODE+"Database started."+RESET_COLOR_CODE);
-
-		// connect to db.
-		rethinkdb.connect({host: db_host, port: db_port}, async (err, connection) => {
-			if(err !== null){
-				console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
-				console.log(err.message);
-				process.exit(1);
-			}
-			console.log(GREEN_COLOR_CODE+"Connected successfully to the database"+RESET_COLOR_CODE);
-			db_client = connection;
-
-			if(config.put_fake_data){
-				console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
-				console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
-				setTimeout( () => {
-					require('../doc/fake_data.js').populate_db(connection,rethinkdb);
-				},5 * 1000);
-			}
-		});
 	});
 
 };
