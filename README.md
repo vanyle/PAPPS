@@ -40,12 +40,12 @@ sudo apt-get install -y mongodb-org
 
 Télécharger le "MongoDB Community Server" depuis le site: https://www.mongodb.com/try/download/community Sélectionnez bien Windows, la version 4.4.1 (ou supérieur) et msi pour le type de paquet.
 
-Lancer l'exécutable et suivez les étapes d'installation. Lorsque vous avez fini, ajouter dans votre PATH le chemin vers l'exécutable "mongod.exe". Si vous ne voulez pas modifier votre PATH, ajoutez dans le fichier de configuration le chemin vers l'exécutable dans l'option mongo_program:
+Lancer l'exécutable et suivez les étapes d'installation. Lorsque vous avez fini, ajouter dans votre PATH le chemin vers l'exécutable "mongod.exe". Si vous ne voulez pas modifier votre PATH, ajoutez dans le fichier de configuration le chemin vers l'exécutable dans l'option mongo_program. Par exemple, pour mon installation:
 
-```json
+```js
 {
-	// ...
-	"mongo_program":"D:\MongoDB\Server\4.4\bin\mongod.exe", // remplacer ce chemin par celui ou vous avez installer la base de donnée
+    // ...
+    "mongo_program":"D:/MongoDB/Server/4.4/bin/mongod.exe", // remplacer ce chemin par celui ou vous avez installer la base de donnée
     // ...
 }
 ```
