@@ -75,7 +75,7 @@ module.exports.setup = (c) => {
 
 		let version = stdout.split("\n",2)[0].split("v",3)[2];
 
-		console.log("Your mongod version is: ",version);
+		console.log("Your mongod version is:",version);
 		version = version.split(".");
 		if(version[0] >= 4 && version[1] >= 4){
 			console.log("JSON logs enabled");
@@ -124,16 +124,17 @@ module.exports.setup = (c) => {
 			if(err !== null){
 				console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read MongoDB logs for more informations."+RESET_COLOR_CODE);
 			}
-			console.log(GREEN_COLOR_CODE+"Connected successfully to server"+RESET_COLOR_CODE);
+			console.log(GREEN_COLOR_CODE+"Connected successfully to the database"+RESET_COLOR_CODE);
 			
 			mongo_client = client;
 			db = mongo_client.db(DB_NAME);
 
 			if(config.put_fake_data){
-				console.log(YELLOW_COLOR_CODE+"Overriding database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
+				console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
 				console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
 				setTimeout( () => {
 					require('../doc/fake_data.js').populate_db(db);
+					console.log("Database overwrited.")
 				},5 * 1000);
 			}
 
