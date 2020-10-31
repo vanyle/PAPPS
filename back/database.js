@@ -33,11 +33,11 @@ function process_logs_from_database(data){
 function start_db_client(){
 	client_started = true;
 	// connect to db.
-	rethinkdb.connect({host: db_host, port: db_port}, async (err, connection) => {
+	rethinkdb.connect({host: db_host, port: db_port}, (err, connection) => {
 		if(err !== null){
 			console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
 			console.log(err.message);
-			process.exit(1);
+			process.kill(process.pid, "SIGINT"); // clean shutdown of the db
 		}
 		console.log(GREEN_COLOR_CODE+"Connected successfully to the database at "+db_host+":"+db_port+RESET_COLOR_CODE);
 		db_client = connection;
@@ -70,7 +70,7 @@ module.exports.setup = (c) => {
 
 	console.log("Starting database ...");
 
-	cp.exec(config.db_program+" --version",{cwd:"./back/"}, async (err,stdout,stderr) => {
+	cp.exec(config.db_program+" --version",{cwd:"./back/"}, (err,stdout,stderr) => {
 		if(err){
 			console.log(RED_COLOR_CODE+"Unable to start database:"+RESET_COLOR_CODE);
 			console.log(err.message);
@@ -108,7 +108,7 @@ module.exports.setup = (c) => {
 				if(data[i] == '\n'){
 					// process the logs and flush the buffer
 					process_logs_from_database(databuffer);
-					if(databuffer.indexOf("Listening on driver address" != -1) && !client_started){
+					if(databuffer.indexOf("Listening on driver address") !== -1 && !client_started){
 						start_db_client();
 					}
 					databuffer = "";
@@ -128,6 +128,7 @@ module.exports.setup = (c) => {
 		process.on('SIGHUP',manage_shutdown); // called when terminal is closed
 		process.on('SIGINT',manage_shutdown); // called when Ctrl-C
 		process.on('SIGTERM',manage_shutdown);
+		process.on('SIGKILL',manage_shutdown);
 
 		console.log(GREEN_COLOR_CODE+"Database started."+RESET_COLOR_CODE);
 	});
