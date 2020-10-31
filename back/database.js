@@ -8,6 +8,8 @@ let mongo_process = null;
 let mongo_client = null;
 let db = null;
 
+let json_logs = false; // mongod uses JSON logs with version >= 4.4
+
 const DB_NAME = "PAPS";
 
 const RED_COLOR_CODE = "\u001b[31m";
@@ -23,16 +25,20 @@ function manage_shutdown(){
 
 function process_query_from_database(data){
 	try{
-		let query = JSON.parse(data);
-		// query.s contains severity of message.
-		// I = info, W = warning, E = error.
+		if(json_logs){
+			let query = JSON.parse(data);
+			// query.s contains severity of message.
+			// I = info, W = warning, E = error.
 
-		if(query.s === 'I'){
-			//console.log("MongoDB: INFO ["+query.t.$date+"] "+query.msg)
-		}else if(query.s === "W"){
-			console.log("MongoDB:"+YELLOW_COLOR_CODE+" WARNING"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg);			
-		}else if(query.s === "E"){
-			console.log("MongoDB:"+RED_COLOR_CODE+" ERROR"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg+": "+query.attr.error);		
+			if(query.s === 'I'){
+				//console.log("MongoDB: INFO ["+query.t.$date+"] "+query.msg)
+			}else if(query.s === "W"){
+				console.log("MongoDB:"+YELLOW_COLOR_CODE+" WARNING"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg);			
+			}else if(query.s === "E"){
+				console.log("MongoDB:"+RED_COLOR_CODE+" ERROR"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg+": "+query.attr.error);		
+			}
+		}else{
+			console.log(data);
 		}
 	}catch(err){
 		console.log(RED_COLOR_CODE+err.message+RESET_COLOR_CODE);
@@ -66,6 +72,19 @@ module.exports.setup = (c) => {
 			console.log("If the database is installed, \"mongod --version\" should print the version installed.")
 			process.exit(1);
 		}
+
+		let version = stdout.split("\n",2)[0].split("v",3)[2];
+
+		console.log("Your mongod version is: ",version);
+		version = version.split(".");
+		if(version[0] >= 4 && version[1] >= 4){
+			console.log("JSON logs enabled");
+			json_logs = true;
+		}else{
+			console.log("JSON logs disabled");
+			json_logs = false;
+		}
+
 		// database seems to be properly installed.
 
 		mongo_process = cp.spawn(config.mongo_program,["--dbpath=" + config.db_path,"--bind_ip=" + config.mongo_host,"--port=" + config.mongo_port]);
