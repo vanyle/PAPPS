@@ -9,7 +9,7 @@ Lisez ce fichier avant de contribuer, il contient des bonnes pratiques à suivre
 
 L'application est construire avec NodeJS et Express. Le back-end communique avec le front-end avec Ajax par le end-point `/q`
 
-Elle utilise une base de donnée "mongodb" que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config.
+Elle utilise une base de donnée "rethinkdb" que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config.
 
 Elle se lance en faisant `npm start` ou `node server.js`
 
@@ -17,7 +17,7 @@ Elle se lance en faisant `npm start` ou `node server.js`
 
 ### Node
 
-Si Node n'est pas installé, on commence par l'installer avec ces commandes (Pour Ubuntu)
+Si Node n'est pas installé, on commence par l'installer avec ces commandes (Pour Ubuntu ou Debian)
 
 ```sh
 sudo apt-get install nodejs
@@ -38,32 +38,32 @@ cd PAPPS
 npm install
 ```
 
-Ensuite, il faut installer la base de donner "mongodb".
+Ensuite, il faut installer la base de donner "rethinkdb". Les instructions générales se trouvent ici: https://rethinkdb.com/docs/install/
 
-Utilisez ces instructions pour installer la base de donnée sur Ubuntu: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-
-### Pour Ubuntu 20.04
+### Pour Debian
 
 ```sh
-wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+export CODENAME=`lsb_release -cs`
+echo "deb https://download.rethinkdb.com/repository/debian-$CODENAME $CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+wget -qO- https://download.rethinkdb.com/repository/raw/pubkey.gpg | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install -y mongodb-org
+sudo apt-get install rethinkdb
+```
+
+### Pour Ubuntu
+
+```sh
+source /etc/lsb-release && echo "deb https://download.rethinkdb.com/repository/ubuntu-$DISTRIB_CODENAME $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+wget -qO- https://download.rethinkdb.com/repository/raw/pubkey.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install rethinkdb
 ```
 
 ### Pour Windows
 
-Télécharger le "MongoDB Community Server" depuis le site: https://www.mongodb.com/try/download/community Sélectionnez bien Windows, la version 4.4.1 (ou supérieur) et msi pour le type de paquet.
+Téléchargez "RethinkDB" depuis cette URL: https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.5.zip
 
-Lancer l'exécutable et suivez les étapes d'installation. Lorsque vous avez fini, ajouter dans votre PATH le chemin vers l'exécutable "mongod.exe". Si vous ne voulez pas modifier votre PATH, ajoutez dans le fichier de configuration le chemin vers l'exécutable dans l'option mongo_program. Par exemple, pour mon installation:
-
-```js
-{
-    // ...
-    "mongo_program":"D:/MongoDB/Server/4.4/bin/mongod.exe", // remplacer ce chemin par celui ou vous avez installer la base de donnée
-    // ...
-}
-```
+Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans votre PATH ou dans le même dossier que `database.js` i.e. `/back`
 
 ## Faire marcher le HTTPS
 

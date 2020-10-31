@@ -3,9 +3,10 @@
 	"https_port":443,
 	"host":"localhost",
 
-	"mongo_host":"127.0.0.1",
-	"mongo_program":"mongod",
+	"db_host":"127.0.0.1",
+	"db_program":"rethinkdb",
 	"db_path":"./db/",
+	"db_more_arguments":["--no-http-admin"],
 	"https_secret":"./secret/",
 
 	"put_fake_data":false

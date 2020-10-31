@@ -1,12 +1,14 @@
+"use strict";
 const cp = require('child_process');
 const fs = require('fs');
-const MongoClient = require('mongodb').MongoClient;
-let db_url = null; // config load is needed to init these
+const path = require('path');
+const rethinkdb = require('rethinkdb');
+
+let db_host = null; // config load is needed to init these
 let db_port = null;
 let config = {};
-let mongo_process = null;
-let mongo_client = null;
-let db = null;
+let db_process = null;
+let db_client = null;
 
 let json_logs = false; // mongod uses JSON logs with version >= 4.4
 
@@ -20,41 +22,22 @@ const RESET_COLOR_CODE = "\u001b[0m";
 function manage_shutdown(){
 	console.log("Shutting down database.");
 	// The server is about to be shutdown, cleanly shutdown the database also to prevent data corruption
-	mongo_client.close();
+	db_client.close();
 }
 
-function process_query_from_database(data){
-	try{
-		if(json_logs){
-			let query = JSON.parse(data);
-			// query.s contains severity of message.
-			// I = info, W = warning, E = error.
-
-			if(query.s === 'I'){
-				//console.log("MongoDB: INFO ["+query.t.$date+"] "+query.msg)
-			}else if(query.s === "W"){
-				console.log("MongoDB:"+YELLOW_COLOR_CODE+" WARNING"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg);			
-			}else if(query.s === "E"){
-				console.log("MongoDB:"+RED_COLOR_CODE+" ERROR"+RESET_COLOR_CODE+" ["+query.t.$date+"] "+query.msg+": "+query.attr.error);		
-			}
-		}else{
-			console.log(data);
-		}
-	}catch(err){
-		console.log(RED_COLOR_CODE+err.message+RESET_COLOR_CODE);
-		console.log(data);
-	}
-
+function process_logs_from_database(data){
+	console.log("[RethingDB]",data);
 }
 
 module.exports.setup = (c) => {
 	config = c;
-	config.mongo_program = config.mongo_program || "mongod"; // set default value
-	config.mongo_host = config.mongo_host || "localhost";
-	config.mongo_port = config.mongo_port || 27017;
+	config.db_program = config.db_program || "rethinkdb"; // set default value
+	config.db_host = config.db_host || "localhost";
+	config.db_port = config.db_port || 27017;
 	config.db_path = config.db_path || "./db/";
-	db_url = config.mongo_host;
-	db_port = config.mongo_port;
+	config.db_more_arguments = config.db_more_arguments || [];
+	db_host = config.db_host;
+	db_port = config.db_port;
 
 	// create database folder for first time initialization:
 	if(config.db_path === "./db/" && !fs.existsSync(config.db_path)){
@@ -64,7 +47,7 @@ module.exports.setup = (c) => {
 
 	console.log("Starting database ...");
 
-	cp.exec(config.mongo_program+" --version", (err,stdout,stderr) => {
+	cp.exec(config.db_program+" --version",{cwd:"./back/"}, async (err,stdout,stderr) => {
 		if(err){
 			console.log(RED_COLOR_CODE+"Unable to start database:"+RESET_COLOR_CODE);
 			console.log(err.message);
@@ -73,40 +56,46 @@ module.exports.setup = (c) => {
 			process.exit(1);
 		}
 
-		let version = stdout.split("\n",2)[0].split("v",3)[2];
+		let version = stdout.split("\n",2)[0].split("-",2)[0].split(" ")[1];
 
-		console.log("Your mongod version is:",version);
-		version = version.split(".");
-		if(version[0] >= 4 && version[1] >= 4){
-			console.log("JSON logs enabled");
-			json_logs = true;
-		}else{
-			console.log("JSON logs disabled");
-			json_logs = false;
-		}
+		console.log("Your rethinkdb version is:",version);
 
 		// database seems to be properly installed.
+		let command_line_options = [
+			"--no-default-bind",
+			"-d", path.join("..",config.db_path),
+			"--bind",config.db_host,
+			"--driver-port",config.db_port,
+			"--cluster-port",config.db_port+1,
+			"--http-port",config.db_port+2];
 
-		mongo_process = cp.spawn(config.mongo_program,["--dbpath=" + config.db_path,"--bind_ip=" + config.mongo_host,"--port=" + config.mongo_port]);
+		command_line_options = command_line_options.concat(config.db_more_arguments);
+
+		console.log("Running: "+config.db_program+" "+command_line_options.join(" "));
+
+		db_process = cp.spawn(config.db_program,command_line_options,{cwd:"./back/"});
 		
 		let databuffer = "";
-		mongo_process.stdout.on('data', (data) => {
+		db_process.stdout.on('data', (data) => {
 			// convert data from buffer to string:
 			data = data + "";
 
 			// add data to buffer until a line break is found.
 			for(let i = 0;i < data.length;i++){
 				if(data[i] == '\n'){
-					// process the JSON and flush the buffer
-					process_query_from_database(databuffer);
+					// process the logs and flush the buffer
+					process_logs_from_database(databuffer);
 					databuffer = "";
 				}else{
 					databuffer += data[i];
 				}
 			}
 		});
-		mongo_process.on('close', (code) => {
-			console.log(`Mongod process exited with code ${code}`);
+		db_process.stderr.on('data', (data) => {
+			console.error(data+"");
+		});
+		db_process.on('close', (code) => {
+			console.log(`Database process exited with code ${code}`);
 			process.exit(0);
 		});
 
@@ -116,50 +105,23 @@ module.exports.setup = (c) => {
 
 		console.log(GREEN_COLOR_CODE+"Database started."+RESET_COLOR_CODE);
 
-		// This is where the url for connecting to the database is built.
-		// This should be customizable because a lot of options (like auth) can be put here.
-		const url = "mongodb://" + db_url + ":" + db_port;
 		// connect to db.
-		MongoClient.connect(url,{useUnifiedTopology: true}, async (err, client) => {
+		rethinkdb.connect({host: db_host, port: db_port}, async (err, connection) => {
 			if(err !== null){
-				console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read MongoDB logs for more informations."+RESET_COLOR_CODE);
+				console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
+				console.log(err.message);
+				process.exit(1);
 			}
 			console.log(GREEN_COLOR_CODE+"Connected successfully to the database"+RESET_COLOR_CODE);
-			
-			mongo_client = client;
-			db = mongo_client.db(DB_NAME);
+			db_client = connection;
 
 			if(config.put_fake_data){
 				console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
 				console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
 				setTimeout( () => {
-					require('../doc/fake_data.js').populate_db(db);
-					console.log("Database overwrited.")
+					require('../doc/fake_data.js').populate_db(connection,rethinkdb);
 				},5 * 1000);
 			}
-
-			/*const recipe = {
-				title:"Frites",
-				tags:["Vegan","Gras","Patate"],
-				ingredients:["Pommes de terre","Huile de colza","Sel"],
-				rating:5,
-				content:"Faire frire les <b>patates</b> et c'est prêt :)",
-				comments:[
-					{
-						user:1, // userid
-						content:"J'aime beaucoup, merci pour cette recette."
-					}
-				]
-			};
-
-			const result1 = await recipes.deleteMany({}); // remove all recipes.
-
-			const result = await recipes.insertOne(recipe);
-
-			recipes.find({}).toArray(function(err, docs) {
-				console.log("Found the following records");
-				console.log(docs)
-			});*/
 		});
 	});
 
@@ -170,16 +132,37 @@ function send_error(res,msg){
 	res.send({'error':msg});
 }
 
-module.exports.handle_query = (req,res) => {
-	if(db == null){
+async function listTable(conn,r){
+	return new Promise((resolve) => {
+		r.tableList().run(conn, (err,result) => {
+			resolve({err:err,result:result});
+		});
+	});
+}
+
+module.exports.handle_query = async (req,res) => {
+	if(db_client === null){
 		send_error(res,"database not ready. Please wait a bit.");
 		return;
 	}
 
 	if(req.query.type === "recipes"){
-		const recipes = db.collection('recipes');
-		recipes.find({}).toArray(function(err, docs) {
-			res.send(docs);
+
+		//let tablesInfo = await listTable(db_client,rethinkdb);
+		//console.log(tablesInfo.result);
+
+		rethinkdb.table('recipes').run(db_client, function(err, cursor) {
+		    if (err) throw err; // todo: handle this better than just throwing
+
+		    cursor.toArray(function(err, result) {
+		        if (err){
+		        	console.log("An error occured while processing the query: "+req.url);
+		        	console.log(err.message);
+		        	res.send([]);
+		        	return;
+		        }
+		        res.send(result);
+		    });
 		});
 	}else{
 		send_error(res,"type option not recognized");
