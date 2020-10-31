@@ -6,6 +6,9 @@ let db_port = null;
 let config = {};
 let mongo_process = null;
 let mongo_client = null;
+let db = null;
+
+const DB_NAME = "PAPS";
 
 const RED_COLOR_CODE = "\u001b[31m";
 const YELLOW_COLOR_CODE = "\u001b[33m";
@@ -98,13 +101,39 @@ module.exports.setup = (c) => {
 		// This should be customizable because a lot of options (like auth) can be put here.
 		const url = "mongodb://" + db_url + ":" + db_port;
 		// connect to db.
-		MongoClient.connect(url,{useUnifiedTopology: true}, function(err, client) {
+		MongoClient.connect(url,{useUnifiedTopology: true}, async (err, client) => {
 			if(err !== null){
 				console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read MongoDB logs for more informations."+RESET_COLOR_CODE);
 			}
 			console.log(GREEN_COLOR_CODE+"Connected successfully to server"+RESET_COLOR_CODE);
 			
 			mongo_client = client;
+			db = mongo_client.db(DB_NAME);
+
+			const recipes = db.collection('recipes');
+
+			/*const recipe = {
+				title:"Frites",
+				tags:["Vegan","Gras","Patate"],
+				ingredients:["Pommes de terre","Huile de colza","Sel"],
+				rating:5,
+				content:"Faire frire les <b>patates</b> et c'est prêt :)",
+				comments:[
+					{
+						user:1, // userid
+						content:"J'aime beaucoup, merci pour cette recette."
+					}
+				]
+			};
+
+			const result1 = await recipes.deleteMany({}); // remove all recipes.
+
+			const result = await recipes.insertOne(recipe);
+
+			recipes.find({}).toArray(function(err, docs) {
+				console.log("Found the following records");
+				console.log(docs)
+			});*/
 		});
 	});
 
