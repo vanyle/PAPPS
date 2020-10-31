@@ -1,5 +1,10 @@
 {
-	"port":8080,
+	"http_port":8080,
+	"https_port":443,
 	"host":"localhost",
-	"db":"./db/database.db"
+
+	"mongo_host":"127.0.0.1",
+	"mongo_program":"mongod",
+	"db_path":"./db/",
+	"https_secret":"./secret/"
 }
