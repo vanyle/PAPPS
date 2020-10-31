@@ -15,6 +15,17 @@ Elle se lance en faisant `npm start` ou `node server.js`
 
 ## Installation
 
+Si Node n'est pas installé, on commence par l'installer avec ces commandes (Pour Ubuntu)
+
+```sh
+sudo apt-get install nodejs
+sudo apt-get install npm
+```
+
+Sur Windows, Node est disponible ici: https://nodejs.org/en/
+
+Pour savoir si Node est installé, entrez la commande `npm -v` dans un terminal. Si elle affiche une version, c'est que Node marche.
+
 On commence par télécharger le projet et installer les libraries requises par node:
 
 ```
