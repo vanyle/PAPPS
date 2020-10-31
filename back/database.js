@@ -128,7 +128,6 @@ module.exports.setup = (c) => {
 		process.on('SIGHUP',manage_shutdown); // called when terminal is closed
 		process.on('SIGINT',manage_shutdown); // called when Ctrl-C
 		process.on('SIGTERM',manage_shutdown);
-		process.on('SIGKILL',manage_shutdown);
 
 		console.log(GREEN_COLOR_CODE+"Database started."+RESET_COLOR_CODE);
 	});
