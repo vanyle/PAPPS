@@ -16,9 +16,11 @@ module.exports.populate_db = async (db) => {
 		creatorid:1,
 		creation_time:new Date(), // new Date() creates a date representing the current time
 		title:"Frites",
+		description:"Des frites croutillantes pour vos soirées entre amis."
 		tags:["Vegan","Gras","Patate"],
 		ingredients:["Pommes de terre","Huile de colza","Sel"],
 		rating:5,
+		public:true,
 		content:"Faire frire les <b>patates</b> et c'est prêt :)",
 		comments:[
 			{
@@ -36,6 +38,8 @@ module.exports.populate_db = async (db) => {
 		creation_time:new Date(), // new Date() creates a date representing the current time
 		title:"Glace à la vanille",
 		tags:["Dessert","vanille","sucré"],
+		description:"Une glace à la vanille, idéal à déguster en été !",
+		public:true,
 		ingredients:["Crème fraiche","Sucre roux","Extrait de vanile"],
 		rating:4,
 		content:"1. Tout mélanger <br/> 2. Mettre au réfrigérateur pendant 30 minutes",
