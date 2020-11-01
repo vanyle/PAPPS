@@ -62,7 +62,7 @@ sudo apt-get install rethinkdb
 
 ### Pour Windows
 
-Téléchargez RethinkDB depuis cette URL: https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.5.zip
+Téléchargez RethinkDB depuis cette URL: https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.6.zip
 
 Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans votre PATH ou dans le même dossier que `database.js` i.e. `/back`
 
@@ -107,6 +107,10 @@ Le site supporte 2 types d'authentification:
 
 ### Listes des end-points (susceptible de changer.)
 
+Note: Les endpoints en GET ne modifient pas la base de donnée et peuvent être appelés de manière répétée (sauf log et unlog). Ce n'est pas le cas des endpoints en POST qui eux modifient la base de donnée.
+
+------
+
 GET `/q?type=recipes&tag=tag1|tag2|tag3&s=query`
 
 Renvoie la liste de toutes les recettes publiques du site au format JSON contenant les tags fournis et contenant dans leur description ou leur titre `query`. Si tag n'est pas pas renseigné, la requête renverra toutes les recettes disponibles par ordre de `rating` (jusqu'à un maximum de 100 recettes). Même chose si `s` n'est pas renseigné. Note: `s` est une expression régulière.
@@ -122,6 +126,8 @@ Format de la réponse:
 	"tags":["tag1","tag2"],
 },{...}, ...]
 ```
+
+------
 
 GET `/q?type=recipe&id=id`
 
@@ -150,9 +156,13 @@ Format de la réponse:
 }
 ```
 
+------
+
 GET `/q?type=unlog`
 
 Supprime les cookies de l'utilisateur et le déconnecte du site
+
+------
 
 GET `/q?type=log&name=<username>&pass=<password>`
 
@@ -163,11 +173,21 @@ Connecte l'utilisateur au site si name et pass sont correct. Modifie ses cookies
 {"co":"NOOK"} // authentification failed
 ```
 
+------
+
+GET `/q?type=oauth`  (implémentation non terminée)
+
+Redirige l'utilisateur de manière à la connecté par OAuth. Cette URL retourne un code 302. Il ne faut pas charger cette page par AJAX mais rediriger l'utilisateur vers elle pour que l'authentification puisse avoir lieu (avec `window.location` ou un lien par exemple). En cas de succès, les cookies de l'utilisateurs seront modifiés et les requêtes telles que `/q?type=uinfo` fonctionneront.
+
+------
+
 GET `/q?type=uinfo`
 
 Retourne des informations relatives à l'utilisateur si celui-ci est connecté. Retourne une erreur si l'utilisateur n'est pas connecté.
 
 Format de la réponse: `{"name":"name","rights":["admin","make_recipe"],"shopping_lists":[{...},...]}`
+
+------
 
 GET `/q?type=uname&id=<id>`
 
@@ -175,7 +195,9 @@ Retourne le nom de l'utilisateur dont l'id est `<id>` . Retourne une erreur si c
 
 Format de la réponse: `{"name":"name"}`
 
-POST `/q?type=new_recipe`
+------
+
+POST `/q?type=new_recipe` (implémentation non terminée)
 
 Permet de créer une nouvelle recette. Le body de la requête POST doit utiliser le format JSON (`Content-Type:application/json`)
 
@@ -193,11 +215,29 @@ Le format du body est le suivant:
 
 Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "desert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
 
+En cas de succès, la réponse sera: `{"id":"id"}` où `id` est l'identifiant de la recette créée.
 
+------
+
+POST `/q?type=delete_recipe` (implémentation non terminée)
+
+------
+
+POST `/q?type=new_comment` (implémentation non terminée)
+
+------
+
+POST `/q?type=delete_commant` (implémentation non terminée)
+
+------
+
+POST `/q?type=rate` (implémentation non terminée)
+
+------
 
 Les url présentées sont définitives, les champs ne le sont pas: Un champ utilisateur et image seront probablement ajoutés pour les requêtes relatives aux recettes.
 
- 
+------
 
 N'importe quel endpoint est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
 
@@ -205,4 +245,4 @@ N'importe quel endpoint est susceptible de générer une erreur lorsqu'il est ap
 
 Les mots de passe sont stockés hachés 30 fois avec du sel de qualité aléatoire cryptographique avec du sha256, selon un algorithme évitant le parcours de cycle large. Les requêtes sont effectués depuis du JS avec du NoSQL ce qui limite les possibilités d'injection. Le type de toute les variables provenant de l'utilisateur est vérifié pour voir si c'est bien "string". Le contenu affiché à l'utilisateur et stocké dans la base de données est déjà rendu sain pour que l'on puisse distribuer le contenu de la base de données sans traitement supplémentaire. L'assainissement des données s'effectue à l'écriture, pas à la lecture, en particulier l'évasion des tags `HTML`.
 
-Attention, lors du déploiement, le port permettant d'accéder à l'interface HTTP d'administration de la base de données ne doit pas être accessible. De même pour le port permettant de connecter d'autres serveurs pour la réalisation de clusters. Il faut donc bien indiquer les options `-no-http-admin` et mettre `db_port` et `db_port+1`à des ports inaccessibles depuis l'extérieur. (27017 et 27017 par défaut)
+Attention, lors du déploiement, le port permettant d'accéder à l'interface HTTP d'administration de la base de données ne doit pas être accessible. De même pour le port permettant de connecter d'autres serveurs pour la réalisation de clusters. Il faut donc bien indiquer les options `-no-http-admin` et mettre `db_port` et `db_port+1`à des ports inaccessibles depuis l'extérieur. (27017 et 27018 par défaut)

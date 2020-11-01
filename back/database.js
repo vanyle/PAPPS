@@ -255,6 +255,7 @@ module.exports.handle_post_query = async (req,res) => {
 		let body = req.body + "";
 		if(body.length >= 100000){ // basic ddos protection.
 			send_error(res,'body is too big.');
+			return;
 		}
 		try{
 			body = JSON.parse(body);
@@ -262,6 +263,7 @@ module.exports.handle_post_query = async (req,res) => {
 			send_error(res,"invalid json in body.");
 			return;
 		}
+		// check types of body.
 		res.send({msg:"feature not added yet",data:body});
 	}else{
 		send_error(res,"type option not recognized");
