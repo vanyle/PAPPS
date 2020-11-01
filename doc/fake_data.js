@@ -4,12 +4,12 @@
 let rw = require('../back/rethink_wrapper.js');
 
 // Warning, this function override the content of the database !
-module.exports.populate_db = async (conn,r) => {
+module.exports.populate_db = async (r) => {
 
 	// --------------------------------------------------
 	// recipes related
-	await rw.deleteTable("recipes",conn,r); // ignore errors if the table does not exist, this is a setup function
-	await rw.createTable("recipes",conn,r);
+	await rw.deleteTable("recipes",r); // ignore errors if the table does not exist, this is a setup function
+	await rw.createTable("recipes",r);
 
 
 	const recipe1 = {
@@ -31,7 +31,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await rw.insert(recipe1,"recipes",conn,r);
+	await rw.insert(recipe1,"recipes",r);
 
 	const recipe2 = {
 		recipeid:1,
@@ -52,13 +52,13 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await rw.insert(recipe2,"recipes",conn,r);
+	await rw.insert(recipe2,"recipes",r);
 
 
 	// ----------------------------------------------------------
 	// user related
-	await rw.deleteTable("users",conn,r);
-	await rw.createTable("users",conn,r);
+	await rw.deleteTable("users",r);
+	await rw.createTable("users",r);
 
 	const user1 = {
 		userid:0,
@@ -83,7 +83,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await rw.insertOne(user1,"users",conn,r);
+	await rw.insert(user1,"users",r);
 
 	const user2 = {
 		userid:0,
@@ -100,7 +100,7 @@ module.exports.populate_db = async (conn,r) => {
 		]
 	};
 
-	await rw.insertOne(user2,"users",conn,r);
+	await rw.insert(user2,"users",r);
 
 	// More tables will be required based on the features we'll need.
 

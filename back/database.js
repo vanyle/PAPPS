@@ -2,7 +2,7 @@
 const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const rethinkdb = require('rethinkdb');
+let rethinkdb = require('rethinkdbdash');
 const rw = require('./rethink_wrapper.js');
 
 let db_host = null; // config load is needed to init these
@@ -30,30 +30,36 @@ function manage_shutdown(){
 function process_logs_from_database(data){
 	console.log("[RethingDB]",data);
 }
-
-function start_db_client(){
-	client_started = true;
-	// connect to db.
-	rethinkdb.connect({host: db_host, port: db_port}, (err, connection) => {
-		if(err !== null){
-			console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
-			console.log(err.message);
-			process.kill(process.pid, "SIGINT"); // clean shutdown of the db
-		}
-		console.log(GREEN_COLOR_CODE+"Connected successfully to the database at "+db_host+":"+db_port+RESET_COLOR_CODE);
-		db_client = connection;
-
-		if(config.put_fake_data){
-			console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
-			console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
-			setTimeout( () => {
-				require('../doc/fake_data.js').populate_db(connection,rethinkdb);
-			},5 * 1000);
-		}
-	});
+function process_errors_from_client(msg){
+	//console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
+	console.log(msg);
+	//process.kill(process.pid, "SIGINT"); // clean shutdown of the db
 }
 
-module.exports.setup = (c) => {
+function start_db_client(callback){
+	client_started = true;
+	// connect to db.
+	rethinkdb = rethinkdb({
+		host: db_host, // connect to one host and discover the others
+		port: db_port,
+		pool: true,
+		discovery: true,
+		silent:true,
+		log: process_errors_from_client
+	});
+	console.log(GREEN_COLOR_CODE+"Connected successfully to the database at "+db_host+":"+db_port+RESET_COLOR_CODE);
+
+	if(config.put_fake_data){
+		console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
+		console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
+		setTimeout( () => {
+			require('../doc/fake_data.js').populate_db(rethinkdb);
+		},5 * 1000);
+	}
+	callback(rethinkdb);
+}
+
+module.exports.setup = (c,callback) => {
 	config = c;
 	config.db_program = config.db_program || "rethinkdb"; // set default value
 	config.db_host = config.db_host || "localhost";
@@ -85,8 +91,8 @@ module.exports.setup = (c) => {
 		console.log("Your rethinkdb version is:",version);
 
 		// database seems to be properly installed.
+
 		let command_line_options = [
-			"--no-default-bind",
 			"-d", path.join("..",config.db_path),
 			"--bind",config.db_host,
 			"--driver-port",config.db_port,
@@ -110,7 +116,7 @@ module.exports.setup = (c) => {
 					// process the logs and flush the buffer
 					process_logs_from_database(databuffer);
 					if(databuffer.indexOf("Listening on driver address") !== -1 && !client_started){
-						start_db_client();
+						start_db_client(callback);
 					}
 					databuffer = "";
 				}else{
@@ -118,8 +124,21 @@ module.exports.setup = (c) => {
 				}
 			}
 		});
+		let errdatabuffer = "";
 		db_process.stderr.on('data', (data) => {
-			console.error(data+"");
+			// convert data from buffer to string:
+			data = data + "";
+
+			// add data to buffer until a line break is found.
+			for(let i = 0;i < data.length;i++){
+				if(data[i] == '\n'){
+					// process the logs and flush the buffer
+					console.log(errdatabuffer);
+					errdatabuffer = "";
+				}else{
+					errdatabuffer += data[i];
+				}
+			}
 		});
 		db_process.on('close', (code) => {
 			console.log(`Database process exited with code ${code}`);
@@ -140,14 +159,17 @@ function send_error(res,msg){
 	res.send({'error':msg});
 }
 
+// -------------------------------------------------------
+// Endpoint definitions here.
+
 module.exports.handle_query = async (req,res) => {
-	if(db_client === null){
+	if(!client_started){
 		send_error(res,"database not ready. Please wait a bit.");
 		return;
 	}
 
 	if(req.query.type === "recipes"){
-		let result = await rw.get(null,'recipes',db_client,rethinkdb);
+		let result = await rw.get(null,'recipes',rethinkdb);
 		if(result.error){
 			send_error(res,"unable to retreive recipes");
 		}else{

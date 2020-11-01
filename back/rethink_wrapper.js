@@ -1,23 +1,23 @@
 // A thin wrapper around some RethinkDB methods.
 
 
-module.exports.createTable = async (tableName,conn,r) => {
+module.exports.createTable = async (tableName,r) => {
 	return new Promise((resolve) => {
-		r.tableCreate(tableName).run(conn, function(err, result) {
+		r.tableCreate(tableName).run(function(err, result) {
 	    	resolve({err:err,result:result});
 		});
 	});
 }
-module.exports.deleteTable = async (tableName,conn,r) => {
+module.exports.deleteTable = async (tableName,r) => {
 	return new Promise((resolve) => {
-		r.tableDrop(tableName).run(conn, function(err, result) {
+		r.tableDrop(tableName).run(function(err, result) {
 	    	resolve({err:err,result:result});
 		});
 	});
 }
-module.exports.listTable = async (conn,r) => {
+module.exports.listTable = async (r) => {
 	return new Promise((resolve) => {
-		r.tableList().run(conn, (err,result) => {
+		r.tableList().run((err,result) => {
 			resolve({err:err,result:result});
 		});
 	});
@@ -25,27 +25,21 @@ module.exports.listTable = async (conn,r) => {
 
 // If data is an array, all elements of data are inserted.
 // If data is an object, data is inserted.
-module.exports.insert = async (data,tableName,conn,r) => {
+module.exports.insert = async (data,tableName,r) => {
 	return new Promise((resolve) => {
-		r.table(tableName).insert(data).run(conn, function(err, result) {
+		r.table(tableName).insert(data).run(function(err, result) {
 	    	resolve({err:err,result:result});
 		});
 	});
 }
-module.exports.get = async (query,tableName,conn,r) => {
+module.exports.get = async (query,tableName,r) => {
 	return new Promise((resolve) => {
-		r.table(tableName).run(conn, function(err, cursor) {
+		r.table(tableName).run(function(err, result) {
 		    if(err != null){
 		    	resolve({error:err,result:null});
 		    	return;
 			}
-		    cursor.toArray(function(err, result) {
-		        if (err != null){
-		        	resolve({error:err,result:null});
-		    		return;
-		        }
-		        resolve({error:null,result:result});
-		    });
+			resolve({error:null,result:result});
 		});
 	});
 }
