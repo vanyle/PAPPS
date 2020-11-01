@@ -98,13 +98,103 @@ Le schéma de donnée est décrit dans `./doc/fake_data.js` qui permet aussi de 
 
 ### Listes des end-points (susceptible de changer.)
 
-GET `/q?type=recipes`
+GET `/q?type=recipes&tag=tag1|tag2|tag3`
 
-Renvoie la liste de toutes les recettes publiques du site au format JSON.
+Renvoie la liste de toutes les recettes publiques du site au format JSON contenant les tags fournis. Si tag n'est pas pas renseigné, la requête renverra toutes les recettes disponibles dans un ordre aléatoire (jusqu'à un maximum de 200 recettes).
 
-GET `/q?type=users`
+Format de la réponse:
 
-Renvoie la liste de tous les utilisateurs publiques du site au format JSON (non implémenté pour l'instant)
+```js
+[{
+    "id":"id",
+    "creator_name":"creator_name",
+    "creator_id":"creator_id"
+	"title":"title",
+	"description":"description",
+	"rating":4, // 0 - 5
+	"tags":["tag1","tag2"],
+    "preptime":30,
+    "cooktime":20,
+	"comment_count":3 // number of comments
+},{...}, ...]
+```
+
+GET `/q?type=search&s=query&tag=tag1|tag2|tag3`
+
+Renvoie la liste de toutes les recettes contenant `query` dans leur titre ou description et vérifiant les tags fourni. Tag peut être omis.
+
+Format de la réponse: même que précédemment.
+
+GET `/q?type=recipe&id=id`
+
+Renvoie des informations détaillés sur une recette spécifique. Renvoie une erreur si la recette n'existe pas.
+
+Format de la réponse:
+
+```js
+{
+    "id":"id"
+	"title":"title",
+	"description":"description",
+	"rating":4, // 0 - 5
+	"tags":["tag1","tag2"],
+    "preptime":30,
+    "cooktime":20,
+    "steps":["step1","step2",...],
+    "ingredients":["ingredient1","ingredient2",...],
+    "creation_time":"2020-11-01T01:45:01.758Z" // something in this format, can be parsed with new Date(format)
+	"comments":[
+		{
+			"name":"name of the commenter",
+			"userid":"id of the commenter"
+			"content":"content of the comment"
+		}
+	]
+}
+```
+
+GET `/q?type=unlog`
+
+Supprime les cookies de l'utilisateur et le déconnecte du site
+
+GET `/q?type=log&name=<username>&pass=<password>`
+
+Connecte l'utilisateur au site si name et pass sont correct. Modifie ses cookies pour que les requêtes suivantes se fassent en étant connecté. name et pass sont le nom d'utilisateur et le mot de passe sans encryption.
+
+```js
+{"co":"OK"} // authentification success
+{"co":"NOOK"} // authentification failed
+```
+
+GET `/q?type=uinfo`
+
+Retourne des informations relatives à l'utilisateur si celui-ci est connecté. Retourne une erreur si l'utilisateur n'est pas connecté.
+
+Format de la réponse: `{"name":"name","rights":["admin","make_recipe","shopping_lists":{...}]}`
+
+GET `/q?type=uname&id=<id>`
+
+Retourne le nom de l'utilisateur dont l'id est `<id>` . Retourne une erreur si celui-ci n'existe pas.
+
+Format de la réponse: `{"name":"name"}`
+
+POST `/q?type=recipe`
+
+Permet de créer une nouvelle recette. Le body de la requête POST doit utiliser le format JSON (`Content-Type:application/json`)
+
+Le format du body est le suivant:
+
+```js
+{
+    "title":"title", // max length = 100 characters All UTF8 is allowed (including emojis)
+    "description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
+    "tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
+    "ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
+    "steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Basic markdown formatting is supported (*bold*, ~strike~, # title)
+}
+```
+
+Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. Un non-respect des contraintes renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "desert", etc... pour faciliter la recherche.
 
 N'importe quel end-point est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
 

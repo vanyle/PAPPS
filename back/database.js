@@ -3,7 +3,7 @@ const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
 let rethinkdb = require('rethinkdbdash');
-const rw = require('./rethink_wrapper.js');
+const rw = require('./db_interface.js');
 
 let db_host = null; // config load is needed to init these
 let db_port = null;
@@ -53,7 +53,7 @@ function start_db_client(callback){
 		console.log(YELLOW_COLOR_CODE+"Overwriting database with fake data, because put_fake_data=true in config.json"+RESET_COLOR_CODE)
 		console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
 		setTimeout( () => {
-			require('../doc/fake_data.js').populate_db(rethinkdb);
+			require('./fake_data.js').populate_db(rethinkdb);
 		},5 * 1000);
 	}
 	callback(rethinkdb);

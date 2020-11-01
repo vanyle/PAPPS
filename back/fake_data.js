@@ -1,7 +1,12 @@
 // This file contains some fake data to populate the database.
 // It is also used as documentation for what the database looks like.
 
-let rw = require('../back/rethink_wrapper.js');
+"use strict";
+
+let rw = require('./db_interface.js');
+let shajs = require('sha.js');
+
+
 
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (r) => {
@@ -22,10 +27,10 @@ module.exports.populate_db = async (r) => {
 		ingredients:["Pommes de terre","Huile de colza","Sel"],
 		rating:5,
 		public:true,
-		content:"Faire frire les <b>patates</b> et c'est prêt :)",
+		steps:["Faire frire les <b>patates</b>","c'est prêt :)"],
 		comments:[
 			{
-				userid:0, // userid
+				userid:"e33cd1f5-21d7-4655-a8dd-1199ffd6cdcb", // userid
 				content:"J'aime beaucoup, merci pour cette recette."
 			}
 		]
@@ -43,10 +48,10 @@ module.exports.populate_db = async (r) => {
 		public:true,
 		ingredients:["Crème fraiche","Sucre roux","Extrait de vanile"],
 		rating:4,
-		content:"1. Tout mélanger <br/> 2. Mettre au réfrigérateur pendant 30 minutes",
+		steps:["Tout mélanger","Mettre au réfrigérateur pendant 30 minutes"],
 		comments:[
 			{
-				userid:1, // userid
+				userid:"a7032d0e-ff6a-4142-9622-bad619866af9", // userid
 				content:"Je conseille de laisse au frigo plutôt 45 minutes"
 			}
 		]
@@ -60,10 +65,10 @@ module.exports.populate_db = async (r) => {
 	await rw.deleteTable("users",r);
 	await rw.createTable("users",r);
 
-	const user1 = {
-		userid:0,
-		rights:"admin",
+	let user1 = {
+		rights: ["admin","view"],
 		name:"Augustus René Le Comte du Château",
+		salt: rw.make_salt(), // make_salt connects to League servers to retreive the freshest salt available.
 		shopping_lists:[
 			{
 				name:"Banquet de Pâques",
@@ -82,13 +87,16 @@ module.exports.populate_db = async (r) => {
 			}
 		]
 	};
+	user1.pass = rw.hash("chaton",user1.salt); // assumption: the users have no idea what they are doing when choosing their passwords.
+
+	console.log(user1);
 
 	await rw.insert(user1,"users",r);
 
-	const user2 = {
-		userid:0,
-		rights:"view",
+	let user2 = {
+		rights:["view"],
 		name:"Hervé Des Champs Des Bois",
+		salt: rw.make_salt(),
 		shopping_lists:[
 			{
 				name:"Principale",
@@ -99,6 +107,8 @@ module.exports.populate_db = async (r) => {
 			}
 		]
 	};
+
+	user2.pass = rw.hash("azerty",user2.salt);
 
 	await rw.insert(user2,"users",r);
 

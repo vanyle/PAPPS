@@ -56,6 +56,7 @@ function start_webserver(){
 		saveUninitialized: false,
 		cookie: {
 			secure: false,
+			name: "sessionid_data", // used so that people don't know what session manager is used.
 			maxAge: 1000 * 60 * 60 * 24 * 7 // in milliseconds
 		}
 	}));
