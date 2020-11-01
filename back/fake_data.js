@@ -7,6 +7,18 @@ let rw = require('./db_interface.js');
 let shajs = require('sha.js');
 
 
+let rndInnerState = 123;
+// used to get deterministic fake data.
+function seeded_random(){
+	rndInnerState *= 37;
+	rndInnerState += 31;
+	rndInnerState %= 10000;
+	return rndInnerState;
+}
+function seeded_pick(arr){
+	return arr[Math.floor(seeded_random() % arr.length)];
+}
+
 
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (r) => {
@@ -16,9 +28,21 @@ module.exports.populate_db = async (r) => {
 	await rw.deleteTable("users",r); // clear user table.
 	await rw.createTable("users",r);
 
-	rw.create_user("Augustus René Le Comte du Château",["delete_recipe","new_recipe","delete_comment"],"chaton","augustus.chateau@orange.fr");
-	rw.create_user("Hervé Des Champs Des Bois",["delete_recipe","new_recipe"],"azerty","herve.champs@protonmail.com");
-	rw.create_user("bob",[],"qwerty","bob.bob@gmail.com");
+	let names = ["Auguste","René","Charles","Manon","Iza","Bob","XxWarrior76xX","Quentin","Gabrielle","tom","ines","Emma"];
+	let mail_extensions = ["@orange.fr","@gmail.com","@student-cs.fr","@protomail.com","@xyz.fr"];
+	let right_sets = [[],["delete_recipe","new_recipe"],["delete_recipe","new_recipe","delete_comment"]];
+
+	let passwords = ["azerty","qwerty","0987654321","bluck","iloveu","onmappellelovni","696969","pistache"];
+
+	for(let i = 0;i < names.length;i++){
+		let name = names[i];
+		let email = name.toLowerCase() + seeded_pick(mail_extensions);
+		let pass = seeded_pick(passwords);
+		let rights = seeded_pick(right_sets);
+
+		rw.create_user(name,rights,pass,email,r);
+		console.log("Added user: "+name+" with pass: "+pass);
+	}
 
 	// --------------------------------------------------
 	// recipes related
@@ -26,43 +50,83 @@ module.exports.populate_db = async (r) => {
 	await rw.createTable("recipes",r);
 
 
-	const recipe1 = {
-		creator_id:1,
-		creation_time:new Date(), // new Date() creates a date representing the current time
-		title:"Frites",
-		description:"Des frites croutillantes pour vos soirées entre amis.",
-		tags:["Vegan","Gras","Patate"],
-		ingredients:["Pommes de terre","Huile de colza","Sel"],
-		rating:5,
-		steps:["Faire frire les <b>patates</b>","c'est prêt :)"],
-		comments:[
-			{
-				userid:"e33cd1f5-21d7-4655-a8dd-1199ffd6cdcb", // userid
-				content:"J'aime beaucoup, merci pour cette recette."
+	let recipe_names = ["Frite","Gateau","Glace","Steak","Pâtes","Tomates","Poulet","Champignons","Tarte","Roulade","Cheesecake"];
+	let adj_for_recipes = ["à la poêle","au chocolat","à la vanille","au poivre","bolognaise","carbonara","à l'italienne","à la française","au curry","au four","avec des champignons","au citron"];
+
+	let steps_set = [
+		"Faire frire",
+		"Mettre au four à 220 °C",
+		"Mélanger les ingredients",
+		"Saler et poivrer",
+		"Faire revenir les oignons",
+		"Battre le blanc en neige",
+		"Ajouter du dentifrice",
+		"Mettre au réfrigérateur pendant 30 minutes",
+		"Eplucher les carottes"
+	];
+
+	let comments = [
+		"J'aime beaucoup, merci pour cette recette.",
+		"Je conseille de laisser au frigo plutôt 45 minutes",
+		"Bof, j'ai été déçu",
+		"Excellent !😍😍 ",
+		"👌"
+	];
+
+	let tag_list = ["dessert","vegan","gras","petit dejeuné","plat principal","viande","sucré","vanile","chocolat"];
+
+	let descriptions = [
+		"Des frites croutillantes pour vos soirées entre amis.",
+		"Une glace à la vanille, idéal à déguster en été !",
+		"Une description provocante et pertinente qui innove"
+	];
+
+	// generate some fake recipes:
+	for(let i = 0;i < recipe_names.length;i++){
+		for(let j = 0;j < adj_for_recipes.length;j++){
+			let name = recipe_names[i] + " " + adj_for_recipes[j];
+			let desc = seeded_pick(descriptions);
+			let tags = [adj_for_recipes[j],recipe_names[i],seeded_pick(tag_list),seeded_pick(tag_list)];
+			let ingredients = [recipe_names[i],seeded_pick(recipe_names).toLowerCase(),seeded_pick(recipe_names).toLowerCase()];
+			let steps = [];
+			let step_count = 1 + seeded_random() % 10;
+			for(let k = 0;k < step_count;k++){
+				steps.push(seeded_pick(steps_set));
 			}
-		]
-	};
 
-	await rw.insert(recipe1,"recipes",r);
+			// pick a random user. this is annoying to do ...
+			r.table('users').sample(1).run(async (err,one_user) => {
+				if(err){
+					console.log(err);
+					return;
+				}
+				let result = await rw.create_recipe(one_user[0].id,name,desc,tags,ingredients,steps,r);
 
-	const recipe2 = {
-		creator_id:0,
-		creation_time:new Date(), // new Date() creates a date representing the current time
-		title:"Glace à la vanille",
-		tags:["Dessert","vanille","sucré"],
-		description:"Une glace à la vanille, idéal à déguster en été !",
-		ingredients:["Crème fraiche","Sucre roux","Extrait de vanile"],
-		rating:4,
-		steps:["Tout mélanger","Mettre au réfrigérateur pendant 30 minutes"],
-		comments:[
-			{
-				userid:"a7032d0e-ff6a-4142-9622-bad619866af9", // userid
-				content:"Je conseille de laisse au frigo plutôt 45 minutes"
-			}
-		]
-	};
+				if(result.err == null){
+					let recipe_id = result.result.generated_keys[0];
+					console.log("Added recipe for "+name+" by "+one_user[0].name+" ("+one_user[0].id+") with id="+recipe_id);
 
-	await rw.insert(recipe2,"recipes",r);
+					let comment_count = seeded_random() % 20;
+
+					if(comment_count > 0){
+						r.table('users').sample(comment_count).run(async (err,picked_users) => {
+							if(err){
+								console.log(err);
+								return;
+							}
+							if(!(picked_users instanceof Array)) return;
+							console.log("Generating "+picked_users.length+" comments for "+name);
+							for(let k = 0;k < picked_users.length;k++){
+								let result = await rw.create_comment(picked_users[k].id,recipe_id,seeded_pick(comments),r);
+							}
+						});
+					}
+				}
+
+			});
+
+		}
+	}
 
 	// More tables will be required based on the features we'll need.
 

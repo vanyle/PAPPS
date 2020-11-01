@@ -82,8 +82,69 @@ module.exports.create_user = (name,rights,clear_password,email,r) => {
 		shopping_lists:[]
 	};
 	user.pass = module.exports.hash(clear_password,user.salt);
-	return rw.insert(user,"users",r);
+	return module.exports.insert(user,"users",r);
 }
+
+module.exports.create_recipe = (user_id,title,description,tags,ingredients,steps,r) => {
+	// TODO: add safety checks for the types provided.
+	const recipe1 = {
+		creator_id:user_id,
+		creation_time:new Date(), // new Date() creates a date representing the current time
+		title:title,
+		description:description,
+		tags:tags,
+		ingredients:ingredients,
+		rating:2,
+		steps:steps,
+		comments:[]
+	};
+	return module.exports.insert(recipe1,"recipes",r);
+};
+module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
+	// TODO: add more checks on comment_content to prevent XSS.
+	return new Promise((resolve) => {
+		r.table("recipes").get(recipe_id).run((err,recipe_data) => {
+			if(err != null){
+				console.log(err.message);
+		    	resolve({error:"unable to retreive db results, please retry",result:null});
+		    	return;
+			}
+			if(recipe_data === null){
+				resolve({error:"no recipe with the given id exists"});
+				return;
+			}
+			r.table("users").get(user_id).run((err,user_data) => {
+				if(err != null){
+					console.log(err.message);
+			    	resolve({error:"unable to retreive db results, please retry",result:null});
+			    	return;
+				}
+				if(user_data === null){
+					resolve({error:"no user with the given id exists"});
+					return;
+				}
+				let comments = recipe_data.comments;
+
+				comments.push({
+					name: user_data.name,
+					userid: user_data.id,
+					content: comment_content,
+					creation_time:new Date()
+				});
+
+				r.table("recipes").get(recipe_id).update({comments: comments}).run((err,res) => {
+					if(err != null){
+						console.log(err.message);
+				    	resolve({error:"unable to update db, please retry",result:null});
+				    	return;
+					}
+					resolve({error:null,result:res});
+				})
+			});
+		});
+	});
+};
+
 module.exports.retreive_recipes = (tags,search,r) => {
 	return new Promise((resolve) => {
 		let query = r.table("recipes");
