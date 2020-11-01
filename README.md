@@ -115,7 +115,7 @@ Format de la réponse:
 
 ```js
 [{
-    "id":"id",
+	"id":"id",
 	"title":"title",
 	"description":"description",
 	"rating":4, // 0 - 5
@@ -131,20 +131,21 @@ Format de la réponse:
 
 ```js
 {
-    "id":"id"
+	"id":"id"
 	"title":"title",
 	"description":"description",
 	"rating":4, // 0 - 5
 	"tags":["tag1","tag2"],
-    "steps":["step1","step2",...],
-    "ingredients":["ingredient1","ingredient2",...],
-    "creation_time":"2020-11-01T01:45:01.758Z" // something in this format, can be parsed with new Date(format)
+	"steps":["step1","step2",...],
+	"ingredients":["ingredient1","ingredient2",...],
+	"creation_time":"2020-11-01T01:45:01.758Z" // something in this format, can be parsed with new Date(format)
 	"comments":[
 		{
 			"name":"name of the commenter",
 			"userid":"id of the commenter"
 			"content":"content of the comment"
-		}
+		},
+		...
 	]
 }
 ```
@@ -182,11 +183,11 @@ Le format du body est le suivant:
 
 ```js
 {
-    "title":"title", // max length = 100 characters All UTF8 is allowed (including emojis)
-    "description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
-    "tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
-    "ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
-    "steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Basic markdown formatting is supported (*bold*, ~strike~, # title)
+	"title":"title", // max length = 100 characters All UTF8 is allowed (including emojis)
+	"description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
+	"tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
+	"ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
+	"steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Basic markdown formatting is supported (*bold*, ~strike~, # title)
 }
 ```
 
@@ -194,7 +195,7 @@ Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveu
 
 
 
-Les url présentés sont définitives, les champs ne le sont pas: Un champ utilisateur et image seront probablement ajoutés pour les requêtes relatives aux recettes.
+Les url présentées sont définitives, les champs ne le sont pas: Un champ utilisateur et image seront probablement ajoutés pour les requêtes relatives aux recettes.
 
  
 

@@ -112,10 +112,10 @@ module.exports.retreive_recipes = (tags,search,r) => {
 				return doc('title').match(search).or(doc('description').match(search));
 			});
 		}
-		query = query.orderBy(r.desc('rating'));
-		query = query.limit(100);
-
 		query = query.withFields('id','title','description','rating','tags');
+		query = query.limit(100);
+		query = query.orderBy(r.desc('rating'));
+
 
 		query.run((err, result) => {
 		    if(err != null){
