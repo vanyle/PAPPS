@@ -169,16 +169,101 @@ module.exports.handle_query = async (req,res) => {
 	}
 
 	if(req.query.type === "recipes"){
-		let result = await rw.get(null,'recipes',rethinkdb);
+		let tags = req.query.tags || "";
+		if(tags === ""){
+			tags = [];
+		}else{
+			tags = tags.split("|")
+		}
+		let search = req.query.s;
+
+		let result = await rw.retreive_recipes(tags,search,rethinkdb);
 		if(result.error){
-			send_error(res,"unable to retreive recipes");
+			send_error(res,result.error);
 		}else{
 			res.send(result.result);
 		}
+	// -----------------------------------------------
+	}else if(req.query.type === "recipe"){
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided")
+			return;
+		}
+		let result = await rw.retreive_recipe_by_id(id,rethinkdb);
+		if(result.error){
+			send_error(res,result.error);
+		}else{
+			res.send(result.result);
+		}
+	// -----------------------------------------------
+	}else if(req.query.type === "unlog"){
+		req.session.destroy(() => {
+			res.send({msg:"session destroyed."});
+		});
+	}else if(req.query.type === "log"){
+		let username = req.query.name;
+		let password = req.query.pass;
+
+		let login_result = await rw.check_login(username,password,rethinkdb);
+		if(login_result !== false){
+			
+			req.session.co = true;
+			req.session.username = username;
+			// maybe also store user_id and stuff like that
+			req.session.permissions = login_result.rights;
+			req.session.user_id = login_result.id;
+
+			res.send({co:'OK'});
+		}else{
+			res.send({co:'NOOK'});
+		}
+	}else if(req.query.type === "uinfo"){
+		if(req.session.co){
+			let result = await rw.retreive_user_by_id(req.session.user_id,rethinkdb);
+			if(result.error){
+				send_error(res,result.error);
+			}else{
+				res.send(result.result);
+			}
+		}else{
+			send_error(res,"you need to be logged in to perform this request");
+		}
+	}else if(req.query.type === "uname"){
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided")
+			return;
+		}
+		let result = await rw.retreive_user_by_id(id,rethinkdb);
+		if(result.error){
+			send_error(res,result.error);
+		}else{
+			res.send({"name":result.result.name});
+		}
+
 	}else{
 		send_error(res,"type option not recognized");
 	}
 }
 module.exports.handle_post_query = async (req,res) => {
-
+	if(!client_started){
+		send_error(res,"database not ready. Please wait a bit.");
+		return;
+	}
+	if(req.query.type === "new_recipe"){
+		let body = req.body + "";
+		if(body.length >= 100000){ // basic ddos protection.
+			send_error(res,'body is too big.');
+		}
+		try{
+			body = JSON.parse(body);
+		}catch(err){
+			send_error(res,"invalid json in body.");
+			return;
+		}
+		res.send({msg:"feature not added yet",data:body});
+	}else{
+		send_error(res,"type option not recognized");
+	}
 }

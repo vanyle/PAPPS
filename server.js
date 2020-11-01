@@ -62,6 +62,8 @@ function start_webserver(){
 	}));
 
 	app.use('/',express.static('client'));
+	app.use(express.raw({type: '*/*',limit: '2000kb',})); // to retreive bodies of post requests, with 2 Mo limit for image uploads (Most images are under 1 Mo)
+
 	app.get('/',(req,res) => {
 		res.sendFile(__dirname + "/client/index.html");
 	});

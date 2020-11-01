@@ -1,4 +1,5 @@
-# The PAPS app !
+# The PAPS app ! :fried_egg: :green_salad:
+
 Ce repo contient le code pour le site du paps qui permet de partager des recettes de d'organiser sa liste de course.
 
 Plus d'informations ici: https://docs.google.com/document/d/1QQNS7YFifi6eaitlNc8k2h3rlRvja7o_O6aRMfCU7z0/edit#
@@ -9,7 +10,7 @@ Lisez ce fichier avant de contribuer, il contient des bonnes pratiques à suivre
 
 L'application est construire avec NodeJS et Express. Le back-end communique avec le front-end avec Ajax par le end-point `/q`
 
-Elle utilise une base de donnée "rethinkdb" que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config.
+Elle utilise une base de données RethinkDB que l'application lance et gère elle-même. Le dossier vers la base de donnée se trouve dans le fichier de config. Il est possible de lancer plusieurs instances du serveur sur plusieurs ordinateurs différents et avec un peu de configuration (ajout de l'ip d'un des serveurs dans l'option `--join host:port`dans `config.js`), ces instances vont synchronisées leurs données ce qui permet de supporter des millions d'utilisateurs si besoin.
 
 Elle se lance en faisant `npm start` ou `node server.js`
 
@@ -30,7 +31,7 @@ Pour savoir si Node est installé, entrez la commande `npm -v` dans un terminal.
 
 ### PAPPS
 
-On commence par télécharger le projet et installer les libraries requises par node:
+On commence par télécharger le projet et installer les librairies requises par Node:
 
 ```
 git clone https://github.com/vanyle/PAPPS/
@@ -38,7 +39,7 @@ cd PAPPS
 npm install
 ```
 
-Ensuite, il faut installer la base de donner "rethinkdb". Les instructions générales se trouvent ici: https://rethinkdb.com/docs/install/
+Ensuite, il faut installer la base de données RethinkDB. Les instructions générales se trouvent ici: https://rethinkdb.com/docs/install/
 
 ### Pour Debian
 
@@ -61,13 +62,13 @@ sudo apt-get install rethinkdb
 
 ### Pour Windows
 
-Téléchargez "RethinkDB" depuis cette URL: https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.5.zip
+Téléchargez RethinkDB depuis cette URL: https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.5.zip
 
 Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans votre PATH ou dans le même dossier que `database.js` i.e. `/back`
 
 ## Faire marcher le HTTPS
 
-Par défaut, le site utilise HTTP. Si vous le lancer, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
+Par défaut, le site utilise HTTP. Si vous le lancez, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
 
 Pour faire marcher le HTTPS, il faut faire exactement ça, mettre les clefs HTTPS dans le dossier secret, qui devra alors ressembler à ça:
 
@@ -75,11 +76,11 @@ Pour faire marcher le HTTPS, il faut faire exactement ça, mettre les clefs HTTP
 
 Vous pouvez alors lancer le serveur et le https marchera. Pour obtenir les clefs HTTPS, suivez le tutoriel de Viarezo avec Let's Encrypt et certbot. Celui-ci stocke les clefs dans `/etc/letsencrypt/live/` habituellement.
 
-Alternativement, vous pouvez changer la valeur de `https_secret` dans la config pour mettre le chemin vers vos clef (`/etc/letsencrypt/live/nom_du_site` en général si vous utilisez certbot)
+Alternativement, vous pouvez changer la valeur de `https_secret` dans la config pour mettre le chemin vers vos clefs (`/etc/letsencrypt/live/nom_du_site` en général si vous utilisez certbot)
 
 ## Structure du front-end
 
-Le front-end se trouve dans le dossier `/client`. Tout fichier se trouvant dedans est fourni de manière statique au client et est accesible à l'adresse correspondant au nom du fichier (par exemple `client/style.css` est disponible à l'adresse `www.nom_du_site.com/style.css`)
+Le front-end se trouve dans le dossier `/client`. Tout fichier se trouvant dedans est fourni de manière statique au client et est accessible à l'adresse correspondant au nom du fichier (par exemple `client/style.css` est disponible à l'adresse `www.nom_du_site.com/style.css`)
 
 Je recommande de séparer le front en plusieurs fichiers `.html` avec chaque fichier correspondant à un onglet du site. De plus, je recommande les bibliothèques suivantes:
 
@@ -88,42 +89,39 @@ Je recommande de séparer le front en plusieurs fichiers `.html` avec chaque fic
 - https://editorjs.io/ pour l'éditeur de recette (je sais pas si ça sera nécessaire mais si les gens veulent mettre des titres dans leurs recettes et du gras, ça peut être sympa)
 - Eviter JQuery si possible sauf si vous estimez que c'est absolument nécessaire.
 
-Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des suggestions. Sinon, prenez bien les version `minified` des bibliothèques quand vous les intégrez.
+Bien sûr, vous pouvez utiliser les bibliothèques que vous voulez, ce sont des suggestions. Sinon, prenez bien les versions `minified` des bibliothèques quand vous les intégrez.
 
 ## Structure du back-end
 
 Le back-end communique avec le front avec l'adresse `/q`. Les arguments sont fournis au front avec des paramètres GET. Le back-end utilise une base de donnée RethinkDB qui se base sur une structure JSON pour stocker les données. Plus d'info ici: https://rethinkdb.com/
 
-Le schéma de donnée est décrit dans `./doc/fake_data.js` qui permet aussi de peupler la base de donnée avec des données fictives pour tester l'interface. (changer la configuration pour activer les données fictives.)
+Le schéma de données est décrit dans `./doc/fake_data.js` qui permet aussi de peupler la base de données avec des données fictives pour tester l'interface. (changer la configuration pour activer les données fictives.)
+
+### Comptes et authentification
+
+Le site supporte 2 types d'authentification:
+
+**OAuth**: Utilise le compte Viarezo. Permet de voir les recettes, commenter et voter sur les recettes.
+
+**login & password**: Utilise un mot de passe et un nom d'utilisateur. Il faut un accès ssh à la machine pour créer ce type de compte. Ce type de compte permet de commenter, voir les recettes, créer des recettes et modérer les commentaires.
 
 ### Listes des end-points (susceptible de changer.)
 
-GET `/q?type=recipes&tag=tag1|tag2|tag3`
+GET `/q?type=recipes&tag=tag1|tag2|tag3&s=query`
 
-Renvoie la liste de toutes les recettes publiques du site au format JSON contenant les tags fournis. Si tag n'est pas pas renseigné, la requête renverra toutes les recettes disponibles dans un ordre aléatoire (jusqu'à un maximum de 200 recettes).
+Renvoie la liste de toutes les recettes publiques du site au format JSON contenant les tags fournis et contenant dans leur description ou leur titre `query`. Si tag n'est pas pas renseigné, la requête renverra toutes les recettes disponibles par ordre de `rating` (jusqu'à un maximum de 100 recettes). Même chose si `s` n'est pas renseigné. Note: `s` est une expression régulière.
 
 Format de la réponse:
 
 ```js
 [{
     "id":"id",
-    "creator_name":"creator_name",
-    "creator_id":"creator_id"
 	"title":"title",
 	"description":"description",
 	"rating":4, // 0 - 5
 	"tags":["tag1","tag2"],
-    "preptime":30,
-    "cooktime":20,
-	"comment_count":3 // number of comments
 },{...}, ...]
 ```
-
-GET `/q?type=search&s=query&tag=tag1|tag2|tag3`
-
-Renvoie la liste de toutes les recettes contenant `query` dans leur titre ou description et vérifiant les tags fourni. Tag peut être omis.
-
-Format de la réponse: même que précédemment.
 
 GET `/q?type=recipe&id=id`
 
@@ -138,8 +136,6 @@ Format de la réponse:
 	"description":"description",
 	"rating":4, // 0 - 5
 	"tags":["tag1","tag2"],
-    "preptime":30,
-    "cooktime":20,
     "steps":["step1","step2",...],
     "ingredients":["ingredient1","ingredient2",...],
     "creation_time":"2020-11-01T01:45:01.758Z" // something in this format, can be parsed with new Date(format)
@@ -178,7 +174,7 @@ Retourne le nom de l'utilisateur dont l'id est `<id>` . Retourne une erreur si c
 
 Format de la réponse: `{"name":"name"}`
 
-POST `/q?type=recipe`
+POST `/q?type=new_recipe`
 
 Permet de créer une nouvelle recette. Le body de la requête POST doit utiliser le format JSON (`Content-Type:application/json`)
 

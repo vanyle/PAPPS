@@ -18,15 +18,13 @@ module.exports.populate_db = async (r) => {
 
 
 	const recipe1 = {
-		recipeid:0,
-		creatorid:1,
+		creator_id:1,
 		creation_time:new Date(), // new Date() creates a date representing the current time
 		title:"Frites",
 		description:"Des frites croutillantes pour vos soirées entre amis.",
 		tags:["Vegan","Gras","Patate"],
 		ingredients:["Pommes de terre","Huile de colza","Sel"],
 		rating:5,
-		public:true,
 		steps:["Faire frire les <b>patates</b>","c'est prêt :)"],
 		comments:[
 			{
@@ -39,13 +37,11 @@ module.exports.populate_db = async (r) => {
 	await rw.insert(recipe1,"recipes",r);
 
 	const recipe2 = {
-		recipeid:1,
-		creatorid:0,
+		creator_id:0,
 		creation_time:new Date(), // new Date() creates a date representing the current time
 		title:"Glace à la vanille",
 		tags:["Dessert","vanille","sucré"],
 		description:"Une glace à la vanille, idéal à déguster en été !",
-		public:true,
 		ingredients:["Crème fraiche","Sucre roux","Extrait de vanile"],
 		rating:4,
 		steps:["Tout mélanger","Mettre au réfrigérateur pendant 30 minutes"],
@@ -89,8 +85,6 @@ module.exports.populate_db = async (r) => {
 	};
 	user1.pass = rw.hash("chaton",user1.salt); // assumption: the users have no idea what they are doing when choosing their passwords.
 
-	console.log(user1);
-
 	await rw.insert(user1,"users",r);
 
 	let user2 = {
@@ -111,6 +105,25 @@ module.exports.populate_db = async (r) => {
 	user2.pass = rw.hash("azerty",user2.salt);
 
 	await rw.insert(user2,"users",r);
+
+	let user3 = {
+		rights:["view"],
+		name:"bob",
+		salt: rw.make_salt(),
+		shopping_lists:[
+			{
+				name:"Courses",
+				content:[
+					"Meth",
+					"Beuh"
+				]
+			}
+		]
+	};
+
+	user3.pass = rw.hash("qwerty",user3.salt);
+
+	await rw.insert(user3,"users",r);
 
 	// More tables will be required based on the features we'll need.
 
