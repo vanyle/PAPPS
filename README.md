@@ -203,3 +203,5 @@ N'importe quel endpoint est susceptible de générer une erreur lorsqu'il est ap
 ## Sécurité
 
 Les mots de passe sont stockés hachés 30 fois avec du sel de qualité aléatoire cryptographique avec du sha256, selon un algorithme évitant le parcours de cycle large. Les requêtes sont effectués depuis du JS avec du NoSQL ce qui limite les possibilités d'injection. Le type de toute les variables provenant de l'utilisateur est vérifié pour voir si c'est bien "string". Le contenu affiché à l'utilisateur et stocké dans la base de données est déjà rendu sain pour que l'on puisse distribuer le contenu de la base de données sans traitement supplémentaire. L'assainissement des données s'effectue à l'écriture, pas à la lecture, en particulier l'évasion des tags `HTML`.
+
+Attention, lors du déploiement, le port permettant d'accéder à l'interface HTTP d'administration de la base de données ne doit pas être accessible. De même pour le port permettant de connecter d'autres serveurs pour la réalisation de clusters. Il faut donc bien indiquer les options `-no-http-admin` et mettre `db_port` et `db_port+1`à des ports inaccessibles depuis l'extérieur.
