@@ -44,6 +44,8 @@ module.exports.populate_db = async (r) => {
 		console.log("Added user: "+name+" with pass: "+pass);
 	}
 
+	console.log("Generated "+names.length+" users");
+
 	// --------------------------------------------------
 	// recipes related
 	await rw.deleteTable("recipes",r); // ignore errors if the table does not exist, this is a setup function
@@ -81,6 +83,9 @@ module.exports.populate_db = async (r) => {
 		"Une description provocante et pertinente qui innove"
 	];
 
+	let recipe_count = 0;
+	let comment_count = 0;
+
 	// generate some fake recipes:
 	for(let i = 0;i < recipe_names.length;i++){
 		for(let j = 0;j < adj_for_recipes.length;j++){
@@ -104,20 +109,20 @@ module.exports.populate_db = async (r) => {
 
 				if(result.err == null){
 					let recipe_id = result.result.generated_keys[0];
-					console.log("Added recipe for "+name+" by "+one_user[0].name+" ("+one_user[0].id+") with id="+recipe_id);
+					let comment_number = seeded_random() % 20;
 
-					let comment_count = seeded_random() % 20;
+					recipe_count ++;
 
-					if(comment_count > 0){
-						r.table('users').sample(comment_count).run(async (err,picked_users) => {
+					if(comment_number > 0){
+						r.table('users').sample(comment_number).run(async (err,picked_users) => {
 							if(err){
 								console.log(err);
 								return;
 							}
 							if(!(picked_users instanceof Array)) return;
-							console.log("Generating "+picked_users.length+" comments for "+name);
 							for(let k = 0;k < picked_users.length;k++){
-								let result = await rw.create_comment(picked_users[k].id,recipe_id,seeded_pick(comments),r);
+								comment_count ++;
+								rw.create_comment(picked_users[k].id,recipe_id,seeded_pick(comments),r);
 							}
 						});
 					}
@@ -128,7 +133,10 @@ module.exports.populate_db = async (r) => {
 		}
 	}
 
-	// More tables will be required based on the features we'll need.
-
-	console.log("Database overwritten. Fake data added.");
+	// using setTimeout because there is not need for these to be very reliable.
+	setTimeout(() => {
+		console.log("Generated "+recipe_count+" recipes");
+		console.log("Generated "+comment_count+" comments");
+		console.log("Database overwritten. Fake data added.");
+	},3000);
 }
