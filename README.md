@@ -166,7 +166,7 @@ GET `/q?type=uinfo`
 
 Retourne des informations relatives à l'utilisateur si celui-ci est connecté. Retourne une erreur si l'utilisateur n'est pas connecté.
 
-Format de la réponse: `{"name":"name","rights":["admin","make_recipe","shopping_lists":{...}]}`
+Format de la réponse: `{"name":"name","rights":["admin","make_recipe"],"shopping_lists":[{...},...]}`
 
 GET `/q?type=uname&id=<id>`
 
@@ -190,7 +190,16 @@ Le format du body est le suivant:
 }
 ```
 
-Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. Un non-respect des contraintes renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "desert", etc... pour faciliter la recherche.
+Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "desert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
 
-N'importe quel end-point est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
 
+
+Les url présentés sont définitives, les champs ne le sont pas: Un champ utilisateur et image seront probablement ajoutés pour les requêtes relatives aux recettes.
+
+ 
+
+N'importe quel endpoint est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
+
+## Sécurité
+
+Les mots de passe sont stockés hachés 30 fois avec du sel de qualité aléatoire cryptographique avec du sha256, selon un algorithme évitant le parcours de cycle large. Les requêtes sont effectués depuis du JS avec du NoSQL ce qui limite les possibilités d'injection. Le type de toute les variables provenant de l'utilisateur est vérifié pour voir si c'est bien "string". Le contenu affiché à l'utilisateur et stocké dans la base de données est déjà rendu sain pour que l'on puisse distribuer le contenu de la base de données sans traitement supplémentaire. L'assainissement des données s'effectue à l'écriture, pas à la lecture, en particulier l'évasion des tags `HTML`.
