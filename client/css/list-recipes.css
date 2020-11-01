@@ -53,3 +53,8 @@
   position: relative;
   width: max-content;
 }
+
+
+.recipe-card-link:hover {
+  color: black;
+}

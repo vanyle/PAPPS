@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Paps</title>
+	<meta charset="utf8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
+	<link href='style.css' rel='stylesheet'/>
+	<link href='css/recipe.css' rel='stylesheet'/>
+	<link href='css/list-recipes.css' rel='stylesheet'/>
+</head>
+<body>
+	<header>
+		<img src="media/paps.png" alt="Logo de PAPS" width="100px">
+		<nav>
+			<a href='index.html#home'>Accueil</a>
+			<a href='index.html#browse'>Liste des recettes</a>
+			<a href='index.html#new'>Créer une recette</a>
+			<a href='index.html#shop'>Liste de courses</a>
+		</nav>
+	</header>
+
+	<div class="recipe block">
+		<div class="recipe-image-container">
+			<img class="recipe-image" src="media/test_img_recette.jpeg" alt="Photo recette">
+			<img class="recipe-blur" src="media/test_img_recette.jpeg" alt="Photo recette">
+			<h2 class="recipe-title"></h2>
+		</div>
+
+		<div class="recipe-info recipe-part">
+			<div class="recipe-info-top">
+				<span class="recipe-info-author">Par <a href="linkcs.fr">Jeanine</a>, le 24 juillet 2030</span>
+				<div id="recipe-star-rating-container">
+
+				</div>
+			</div>
+			<p class="recipe-description">Une description de la recette. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+		</div>
+
+		<div class="recipe-ingredients recipe-part">
+			<span class="recipe-ingredients-title">Ingrédients</span>
+			<ul class="recipe-ingredients-list">
+			</ul>
+		</div>
+
+		<div class="recipe-steps recipe-part">
+			<span class="recipe-steps-title">Étapes</span>
+			<ol class="recipe-steps-list">
+			</ol>
+		</div>
+
+		<div class="recipe-tag-container recipe-part">
+			<span>Tags :</span>
+			<div class="recipe-tags-list">
+			</div>
+		</div>
+
+		<div class="recipe-comments-container">
+			<span class="recipe-comments-title">Commentaires</span>
+			<div id="recipe-comments-list">
+
+			</div>
+
+		</div>
+	</div>
+
+	<script src="https://kit.fontawesome.com/a0b8c55906.js" crossorigin="anonymous"></script>
+	<script src="js/star.js"></script>
+	<script type="text/javascript">
+		var sc = document.getElementById("recipe-star-rating-container");
+		var StarRate = new StarRating(sc);
+
+		function testRating(rating) {
+			console.log("You rated this recipe " +  (rating*5).toString() + " star(s) out of 5");
+		}
+
+		StarRate.activateRating(testRating);
+
+
+		function get_website(url){
+			return new Promise( (resolve) => {
+				let httpRequest = new XMLHttpRequest();
+				httpRequest.onreadystatechange = () => {
+					if(httpRequest.readyState === XMLHttpRequest.DONE){
+						resolve(httpRequest.responseText);
+					}
+				};
+				httpRequest.open('GET', url, true);
+				httpRequest.send();
+			});
+		}
+
+		async function getUsernameFromId(userid) {
+			let content = await get_website("/q?type=uname&id=" + userid);
+
+			let data = JSON.parse(content);
+
+			return data.name || "Utilisateur inconnu";
+		}
+
+		async function addComment(comment) {
+			var uname = await getUsernameFromId(comment.userid);
+			var commentsContainer = document.querySelector("#recipe-comments-list");
+			var htmlToAdd = '<div class="comment"> <div class="comment-top">'
+			htmlToAdd += '<span class="comment-username">' + uname + '</span>';
+			htmlToAdd += '<span class="comment-date">le jeudi 25 juillet 2030</span></div>';
+			htmlToAdd += '<p class="comment-content">' + comment.content + '</p></div>';
+
+			var innerHTML = commentsContainer.innerHTML;
+			innerHTML += htmlToAdd;
+			commentsContainer.innerHTML = innerHTML;
+		}
+
+		function setRecipeTitle(title) {
+			var titleElement = document.querySelector('.recipe-title');
+			titleElement.innerHTML = title;
+		}
+
+		function setRecipeDescription(description) {
+			var descriptionElement = document.querySelector('.recipe-description');
+			descriptionElement.innerHTML = description;
+		}
+
+		function addIngredient(ingredient) {
+			var ingredientsList = document.querySelector(".recipe-ingredients-list");
+
+			var innerHTML = ingredientsList.innerHTML;
+			innerHTML += "<li>" + ingredient+ "</li>";
+			ingredientsList.innerHTML = innerHTML;
+		}
+
+		function addStep(step) {
+			var stepsList = document.querySelector(".recipe-steps-list");
+
+			var innerHTML = stepsList.innerHTML;
+			innerHTML += "<li>" + step + "</li>";
+			stepsList.innerHTML = innerHTML;
+		}
+
+		function addTag(tag) {
+			var tagsList = document.querySelector(".recipe-tags-list");
+
+			var innerHTML = tagsList.innerHTML;
+			innerHTML += "<a class='tag'>" + tag + "</a>";
+			tagsList.innerHTML = innerHTML;
+		}
+
+		function displayRecipe(title, author, date, rating, tags, description, ingredients, steps, comments) {
+			console.log(title, author, date, rating, description, ingredients, steps, comments);
+
+			setRecipeTitle(title);
+			setRecipeDescription(description);
+
+			StarRate.setRating(rating/5);
+
+			ingredients.forEach((ingredient, i) => {
+				addIngredient(ingredient);
+			});
+
+			steps.forEach((step, i) => {
+				addStep(step);
+			});
+
+			tags.forEach((tag, i) => {
+				addTag(tag);
+			});
+
+			comments.forEach((comment, i) => {
+				addComment(comment);
+			});
+
+		}
+
+
+		async function loadRecipe() {
+			var url = new URL(location.href);
+			var id = url.searchParams.get("id");
+
+			//get data
+
+			let content = await get_website("/q?type=recipe&id=" + id);
+
+			let data = JSON.parse(content);
+
+			//display it
+			displayRecipe(data.title, "Jeanine", new Date(), data.rating, data.tags, data.description, data.ingredients, data.steps, data.comments);
+		}
+
+		(async () => {
+			loadRecipe();
+		})();
+	</script>
+</body>
+</html>

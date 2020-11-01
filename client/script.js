@@ -34,9 +34,8 @@ function titleToID(title) {
         return title.replace("/ /g","-");
 }
 
-function displayRecipeCard(title, description, image, rating = 0) {
-        var id = titleToID(title);
-        var elemHTML = '<div class="list-card" id="' + id + '"> <img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/> <div class="list-recipe-info-container"> <div class="list-recipe-info-top"> <h3 class="list-recipe-title">' + title + '</h3> <div class="sc"> </div> </div><p class="list-recipe-description">' + description + '</p> </div> </div>';
+function displayRecipeCard(id, title, description, image, rating = 0) {
+        var elemHTML = '<a class="recipe-card-link" href="recipe.html?id=' + id + '"><div class="list-card" id="' + id + '"> <img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/> <div class="list-recipe-info-container"> <div class="list-recipe-info-top"> <h3 class="list-recipe-title">' + title + '</h3> <div class="sc"> </div> </div><p class="list-recipe-description">' + description + '</p> </div> </div></a>';
         var list_cont = document.querySelector("#recipe-list-container");
         var inn = list_cont.innerHTML;
         inn += elemHTML;
@@ -58,7 +57,7 @@ async function loadRecipeList() {
 
 	//show recipes
 	recipeList.forEach((recipe, i) => {
-		displayRecipeCard(recipe.title, recipe.description,"media/paps.png",recipe.rating/5);
+		displayRecipeCard(recipe.id, recipe.title, recipe.description,"media/paps.png",recipe.rating/5);
 	});
 
 }

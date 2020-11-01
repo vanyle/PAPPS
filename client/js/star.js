@@ -1,6 +1,7 @@
 class StarRating {
   constructor(container, rating = 0) {
     this.container = container;
+    this.votedRating = 0;
     this.setGraphics();
     this.setRating(rating);
   }
@@ -23,6 +24,8 @@ class StarRating {
     var self = this;
     this.ratingFunction = ratingFunction;
 
+    this.container.style.cursor = "pointer";
+
     this.container.addEventListener("mouseover", function(e) {
       var rect = e.currentTarget.getBoundingClientRect();
       var x = e.clientX - rect.left; //x position within the element.
@@ -34,10 +37,13 @@ class StarRating {
         var rPerc = Math.trunc(5*xPerc + 1)/5;//rounded percentage to correspond to a full star
       }
       self.updateRating(rPerc);
-      self.ratingFunction(rPerc);
+      self.votedRating = rPerc;
     });
     this.container.addEventListener("mouseleave", function(e) {
       self.updateRating(self.rating);
+    });
+    this.container.addEventListener("click", function(e) {
+      self.ratingFunction(self.votedRating);
     });
   }
 }
