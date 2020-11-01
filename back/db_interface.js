@@ -74,6 +74,7 @@ module.exports.get = async (query,tableName,r) => {
 // rights is an array containing the list of rights of the user.
 module.exports.create_user = (name,rights,clear_password,email,r) => {
 	let user = {
+		creation_time: new Date(),
 		email: email,
 		rights: rights,
 		name: name,

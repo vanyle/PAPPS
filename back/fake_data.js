@@ -11,6 +11,15 @@ let shajs = require('sha.js');
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (r) => {
 
+	// ----------------------------------------------------------
+	// user related
+	await rw.deleteTable("users",r); // clear user table.
+	await rw.createTable("users",r);
+
+	rw.create_user("Augustus René Le Comte du Château",["delete_recipe","new_recipe","delete_comment"],"chaton","augustus.chateau@orange.fr");
+	rw.create_user("Hervé Des Champs Des Bois",["delete_recipe","new_recipe"],"azerty","herve.champs@protonmail.com");
+	rw.create_user("bob",[],"qwerty","bob.bob@gmail.com");
+
 	// --------------------------------------------------
 	// recipes related
 	await rw.deleteTable("recipes",r); // ignore errors if the table does not exist, this is a setup function
@@ -54,76 +63,6 @@ module.exports.populate_db = async (r) => {
 	};
 
 	await rw.insert(recipe2,"recipes",r);
-
-
-	// ----------------------------------------------------------
-	// user related
-	await rw.deleteTable("users",r);
-	await rw.createTable("users",r);
-
-	let user1 = {
-		rights: ["admin","view"],
-		name:"Augustus René Le Comte du Château",
-		salt: rw.make_salt(), // make_salt connects to League servers to retreive the freshest salt available.
-		shopping_lists:[
-			{
-				name:"Banquet de Pâques",
-				content:[
-					"Saumon",
-					"Pain",
-					"Tomates"
-				]
-			},
-			{
-				name:"Repas de dimanche",
-				content:[
-					"Huile d'olive",
-					"Mozzarella"
-				]
-			}
-		]
-	};
-	user1.pass = rw.hash("chaton",user1.salt); // assumption: the users have no idea what they are doing when choosing their passwords.
-
-	await rw.insert(user1,"users",r);
-
-	let user2 = {
-		rights:["view"],
-		name:"Hervé Des Champs Des Bois",
-		salt: rw.make_salt(),
-		shopping_lists:[
-			{
-				name:"Principale",
-				content:[
-					"Chocolat Noir",
-					"Crème fraîche"
-				]
-			}
-		]
-	};
-
-	user2.pass = rw.hash("azerty",user2.salt);
-
-	await rw.insert(user2,"users",r);
-
-	let user3 = {
-		rights:["view"],
-		name:"bob",
-		salt: rw.make_salt(),
-		shopping_lists:[
-			{
-				name:"Courses",
-				content:[
-					"Meth",
-					"Beuh"
-				]
-			}
-		]
-	};
-
-	user3.pass = rw.hash("qwerty",user3.salt);
-
-	await rw.insert(user3,"users",r);
 
 	// More tables will be required based on the features we'll need.
 
