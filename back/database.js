@@ -54,7 +54,7 @@ function start_db_client(callback){
 		console.log(YELLOW_COLOR_CODE+"Stop the process if this was an error, you have 5 seconds to do so (use Ctrl-C)"+RESET_COLOR_CODE);
 		setTimeout( () => {
 			require('./fake_data.js').populate_db(rethinkdb);
-		},5 * 1000);
+		},3 * 1000);
 	}
 	callback(rethinkdb);
 }
@@ -187,10 +187,23 @@ module.exports.handle_query = async (req,res) => {
 		let result = await rw.retreive_recipes(tags,search,rethinkdb);
 		send_response(res,result);
 	// -----------------------------------------------
+	}else if(req.query.type === "image"){
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided");
+			return;
+		}
+		let result = await rethinkdb.table("images").get(id);
+		if(result === null){
+			send_error(res,"no image with the given id exists")
+		}else{
+			res.setHeader('Content-Type', 'image/jpg');
+			res.send(result.data);
+		}
 	}else if(req.query.type === "recipe"){
 		let id = req.query.id;
 		if(typeof id !== "string" || id.length < 1){
-			send_error(res,"id not provided")
+			send_error(res,"id not provided");
 			return;
 		}
 		let result = await rw.retreive_recipe_by_id(id,rethinkdb);
@@ -261,8 +274,12 @@ module.exports.handle_post_query = async (req,res) => {
 			send_error(res,"invalid json in body.");
 			return;
 		}
+
+		let image_result = rw.create_image(req.body.image,rethinkdb)
+		if(image_result.error == null) image_result = image_result.result.id;
+
 		// create_recipe should check the types of everything.
-		let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,rethinkdb);
+		let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,image_result,rethinkdb);
 
 		send_response(res,result);
 	}else if(req.query.type === "delete_recipe"){

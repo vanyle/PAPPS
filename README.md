@@ -122,10 +122,19 @@ Format de la réponse:
 	"id":"id",
 	"title":"title",
 	"description":"description",
+     "image_id":"imageid
 	"rating":4, // 0 - 5
 	"tags":["tag1","tag2"],
 },{...}, ...]
 ```
+
+------
+
+
+GET `/q?type=image&id=id`
+
+Permet de récupérer une image d'après son identifiant. Renvoie l'image de manière brut.
+Affichable avec `<img src="/q?type=image&id=id"  alt=""/>`
 
 ------
 
@@ -141,6 +150,7 @@ Format de la réponse:
 	"title":"title",
 	"description":"description",
 	"rating":4, // 0 - 5
+	"image_id":"id" // might not exist or be null
 	"tags":["tag1","tag2"],
 	"steps":["step1","step2",...],
 	"ingredients":["ingredient1","ingredient2",...],
@@ -150,7 +160,7 @@ Format de la réponse:
 		{
 			"name":"name of the commenter",
 			"creation_time":"2020-11-01T23:51:15.760Z",
-			"userid":"id of the commenter",
+			"user_id":"id of the commenter",
 			"content":"content of the comment"
 		},
 		...
@@ -209,13 +219,16 @@ Le format du body est le suivant:
 {
 	"title":"title", // max length = 100 characters All UTF8 is allowed (including emojis)
 	"description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
-	"tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
+	"image":"<img data>", // filecontent of an image, as base64 encoding.
+     "tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
 	"ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
 	"steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Some custom formatting is supported (*bold*, ~strike~)
 }
 ```
 
-Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "dessert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
+Tous les champs sont obligatoires sauf image. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "dessert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
+
+image doit être encodée avec une base64. Pour plus d'information, se référer au post suivant: https://stackoverflow.com/questions/34485420/how-do-you-put-an-image-file-in-a-json-object. La solution avec le canvas permet de crop l'image si celle-ci est trop grosse pour être gentil avec la back-end.
 
 En cas de succès, la réponse sera: `{"id":"id"}` où `id` est l'identifiant de la recette créée.
 
@@ -229,7 +242,7 @@ Retourne: `{msg:OK}` en cas de succès
 
 ------
 
-POST `/q?type=new_comment` (implémentation non terminée)
+POST `/q?type=make_comment` (implémentation non terminée)
 
 ------
 

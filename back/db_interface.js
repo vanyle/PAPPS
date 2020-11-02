@@ -108,7 +108,38 @@ module.exports.create_user = (name,rights,clear_password,email,r) => {
 	return module.exports.insert(user,"users",r);
 }
 
-module.exports.create_recipe = async (user_id,title,description,tags,ingredients,steps,r) => {
+module.exports.create_image = async (data,rethinkdb) => {
+	return new Promise(async (resolve) => {
+		if(data.length >= 1024 * 1024){ // 1 Mo
+			resolve({error:"image is too big"});
+			return;
+		}
+		let allowedMimeTypes = ["jpeg","jpg","gif","png"];
+		let headerLength = -1;
+		for(let i = 0;i < allowedMimeTypes.length;i++){
+			if(data.startsWith('data:image/'+allowedMimeTypes[i]+';base64,')){
+				headerLength = 'data:image/'+allowedMimeTypes[i]+';base64,'.length;
+				break;
+			}
+		}
+
+		if(headerLength == -1){
+			resolve({error:"file is not a valid URI-base64 encoded image"});
+		}
+
+		let buffer = Buffer.from(data.substring(headerLength,data.length), 'base64');
+
+		// convert base64 to raw bytes.
+		let res = await r.table('images').insert({data:buffer});
+		if(res == null){
+			resolve({error:"unable to write data to db, please retry"});
+		}else{
+			resolve({error:null,result:{id:res.generated_keys[0]}})
+		}
+	});
+}
+
+module.exports.create_recipe = async (user_id,title,description,tags,ingredients,steps,image_id,r) => {
 	// TODO: add safety checks for the types provided.
 	return new Promise((resolve) => {
 		r.table("users").get(user_id).run((err,result) => {
@@ -164,6 +195,12 @@ module.exports.create_recipe = async (user_id,title,description,tags,ingredients
 				return;
 			}
 
+			let is_image = r.table("images").get(image_id).run();
+			if(is_image === null){
+				resolve({error:"no image with the given id exists"})
+				return;
+			}
+
 			// everything is valid here.
 			const recipe_to_insert = {
 				creator_id:user_id,
@@ -172,8 +209,9 @@ module.exports.create_recipe = async (user_id,title,description,tags,ingredients
 				description:description,
 				tags:tags,
 				ingredients:ingredients,
-				rating:[], // rating: {userid:id,note:0 - 5}
+				rating:[], // rating: {user_id:id,note:0 - 5}
 				steps:steps,
+				image_id:image_id,
 				comments:[]
 			};
 			r.table("recipes").insert(recipe_to_insert).run(function(err, result) {
@@ -240,15 +278,15 @@ module.exports.rate_recipe = (user_id,recipe_id,new_rating,r) => {
 
 				const new_rating_obj = {
 					note: new_rating,
-					userid: user_id
+					user_id: user_id
 				}
 
 				// if user has already rated the recipe, update his rating, else add a new rating;
 				r.branch(
-					r.table("recipes").get(recipe_id)('rating').filter({userid:user_id}).count().gt(0), // if already rated.
+					r.table("recipes").get(recipe_id)('rating').filter({user_id:user_id}).count().gt(0), // if already rated.
 					r.table("recipes").get(recipe_id).update({rating: r.row("rating").changeAt(
 						// get index of rating.
-						r.row("rating").offsetsOf((rating_element) => {return rating_element.userid = user_id}).nth(0)
+						r.row("rating").offsetsOf((rating_element) => {return rating_element.user_id = user_id}).nth(0)
 						,new_rating_obj)  }), // do this
 					r.table("recipes").get(recipe_id).update({rating: r.row("rating").append(new_rating_obj)}) // else do this
 				).run((err,res) => {
@@ -290,7 +328,7 @@ module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
 				}
 				const new_comment = {
 					name: user_data.name,
-					userid: user_data.id,
+					user_id: user_data.id,
 					content: comment_content,
 					creation_time:new Date()
 				};

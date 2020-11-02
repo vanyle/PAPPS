@@ -4,7 +4,8 @@
 "use strict";
 
 let rw = require('./db_interface.js');
-let shajs = require('sha.js');
+let fs = require('fs');
+let path = require('path');
 
 // used to get deterministic fake data: Linear congruential generator
 // the randomness is poor but it's enough for the current application.
@@ -26,6 +27,32 @@ function seeded_pick(arr){
 
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (r) => {
+
+	// -----------------------------------------------
+	// Image related.
+
+	await rw.deleteTable("images",r); // ignore errors if the table does not exist, this is a setup function
+	await rw.createTable("images",r);
+
+	let image_count = 0;
+
+	// load images from doc with format doc/img*.jpg
+
+	let image_paths = fs.readdirSync('doc');
+	for(let i = 0;i < image_paths.length;i++){
+		if(image_paths[i].endsWith('jpg') && image_paths[i].startsWith('img')){
+			let full_path = path.join("./doc",image_paths[i]);
+			let img_data = fs.readFileSync(full_path);
+			// here, data is binary
+			try{
+				let res = await r.table('images').insert({data:img_data});
+				image_count++;
+			}catch(err){
+				console.log(err.message);
+			}
+		}
+	}
+	console.log("Generated "+image_count + " images");
 
 	// ----------------------------------------------------------
 	// user related
@@ -111,7 +138,9 @@ module.exports.populate_db = async (r) => {
 					return;
 				}
 
-				let result = await rw.create_recipe(one_user[0].id,name,desc,tags,ingredients,steps,r);
+				let image_id = (await r.table('images').sample(1).run())[0].id;
+
+				let result = await rw.create_recipe(one_user[0].id,name,desc,tags,ingredients,steps,image_id,r);
 
 				if(result.error == null){
 					let recipe_id = result.result.id;
@@ -141,6 +170,7 @@ module.exports.populate_db = async (r) => {
 
 		}
 	}
+
 
 	// using setTimeout because there is not need for these to be very reliable.
 	setTimeout(() => {
