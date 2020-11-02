@@ -6,13 +6,17 @@
 let rw = require('./db_interface.js');
 let shajs = require('sha.js');
 
-
-let rndInnerState = 123;
-// used to get deterministic fake data.
+// used to get deterministic fake data: Linear congruential generator
+// the randomness is poor but it's enough for the current application.
+const x0 = 123;
+const M = 256 * 256 * 256;
+const A = 5 + 8 * 52; // a mod 8 = 5 for good quality randomness
+const C = 1; // gcd(c,m) = 1
+let rndInnerState = x0;
 function seeded_random(){
-	rndInnerState *= 37;
-	rndInnerState += 31;
-	rndInnerState %= 10000;
+	rndInnerState *= A;
+	rndInnerState += C;
+	rndInnerState %= M;
 	return rndInnerState;
 }
 function seeded_pick(arr){
@@ -30,7 +34,7 @@ module.exports.populate_db = async (r) => {
 
 	let names = ["Auguste","René","Charles","Manon","Iza","Bob","XxWarrior76xX","Quentin","Gabrielle","tom","ines","Emma"];
 	let mail_extensions = ["@orange.fr","@gmail.com","@student-cs.fr","@protomail.com","@xyz.fr"];
-	let right_sets = [[],["delete_recipe","new_recipe"],["delete_recipe","new_recipe","delete_comment"]];
+	let right_sets = [[],["delete_recipe","make_recipe"],["delete_recipe","make_recipe","delete_comment"],["make_recipe"]];
 
 	let passwords = ["azerty","qwerty","0987654321","bluck","iloveu","onmappellelovni","696969","pistache"];
 
@@ -41,7 +45,7 @@ module.exports.populate_db = async (r) => {
 		let rights = seeded_pick(right_sets);
 
 		rw.create_user(name,rights,pass,email,r);
-		console.log("Added user: "+name+" with pass: "+pass);
+		console.log("Added user: "+name+" with pass: "+pass+ " and rights: "+rights);
 	}
 
 	console.log("Generated "+names.length+" users");
@@ -91,25 +95,27 @@ module.exports.populate_db = async (r) => {
 		for(let j = 0;j < adj_for_recipes.length;j++){
 			let name = recipe_names[i] + " " + adj_for_recipes[j];
 			let desc = seeded_pick(descriptions);
-			let tags = [adj_for_recipes[j],recipe_names[i],seeded_pick(tag_list),seeded_pick(tag_list)];
-			let ingredients = [recipe_names[i],seeded_pick(recipe_names).toLowerCase(),seeded_pick(recipe_names).toLowerCase()];
+			let ingredients = [recipe_names[i],seeded_pick(recipe_names),seeded_pick(recipe_names)];
+			let tags = [recipe_names[i].toLowerCase(),seeded_pick(tag_list).toLowerCase(),seeded_pick(tag_list).toLowerCase()];
 			let steps = [];
-			let step_count = 1 + seeded_random() % 10;
+			let step_count = 1 + seeded_random() % 11;
+
 			for(let k = 0;k < step_count;k++){
 				steps.push(seeded_pick(steps_set));
 			}
 
-			// pick a random user. this is annoying to do ...
-			r.table('users').sample(1).run(async (err,one_user) => {
+			// pick a random user that is allowed to create recipes
+			r.table('users').filter(r.row('rights').contains('make_recipe')).sample(1).run(async (err,one_user) => {
 				if(err){
 					console.log(err);
 					return;
 				}
+
 				let result = await rw.create_recipe(one_user[0].id,name,desc,tags,ingredients,steps,r);
 
-				if(result.err == null){
-					let recipe_id = result.result.generated_keys[0];
-					let comment_number = seeded_random() % 20;
+				if(result.error == null){
+					let recipe_id = result.result.id;
+					let comment_number = seeded_random() % 19;
 
 					recipe_count ++;
 
@@ -120,12 +126,15 @@ module.exports.populate_db = async (r) => {
 								return;
 							}
 							if(!(picked_users instanceof Array)) return;
+
 							for(let k = 0;k < picked_users.length;k++){
 								comment_count ++;
 								rw.create_comment(picked_users[k].id,recipe_id,seeded_pick(comments),r);
 							}
 						});
 					}
+				}else{
+					console.log("Error while generating recipe: "+result.error);
 				}
 
 			});

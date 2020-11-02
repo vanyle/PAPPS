@@ -27,10 +27,10 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const RDBStore = require('session-rethinkdb')(session);
+//const netstat = require('node-netstat'); // used to make deployement easier by detecting ports already in use and the processes associated.
 
 let store = null;
 let app = null;
-
 
 database.setup(config, (r) => {
 	// called when database is ready. Might never be called is the database does not work.

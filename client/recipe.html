@@ -28,7 +28,7 @@
 
 		<div class="recipe-info recipe-part">
 			<div class="recipe-info-top">
-				<span class="recipe-info-author">Par <a href="linkcs.fr">Jeanine</a>, le 24 juillet 2030</span>
+				<span class="recipe-info-author">Par <a class='recipe-author' href="linkcs.fr">Jeanine</a>, le 24 juillet 2030</span>
 				<div id="recipe-star-rating-container">
 
 				</div>
@@ -98,10 +98,9 @@
 		}
 
 		async function addComment(comment) {
-			var uname = await getUsernameFromId(comment.userid);
 			var commentsContainer = document.querySelector("#recipe-comments-list");
 			var htmlToAdd = '<div class="comment"> <div class="comment-top">'
-			htmlToAdd += '<span class="comment-username">' + uname + '</span>';
+			htmlToAdd += '<span class="comment-username">' + comment.name + '</span>';
 			htmlToAdd += '<span class="comment-date">le jeudi 25 juillet 2030</span></div>';
 			htmlToAdd += '<p class="comment-content">' + comment.content + '</p></div>';
 
@@ -112,7 +111,12 @@
 
 		function setRecipeTitle(title) {
 			var titleElement = document.querySelector('.recipe-title');
-			titleElement.innerHTML = title;
+			titleElement.innerText = title;
+		}
+
+		function setRecipeAuthor(author){
+			var authorElement = document.querySelector('.recipe-author');
+			authorElement.innerText = author;
 		}
 
 		function setRecipeDescription(description) {
@@ -148,6 +152,7 @@
 			console.log(title, author, date, rating, description, ingredients, steps, comments);
 
 			setRecipeTitle(title);
+			setRecipeAuthor(author);
 			setRecipeDescription(description);
 
 			StarRate.setRating(rating/5);
@@ -182,7 +187,7 @@
 			let data = JSON.parse(content);
 
 			//display it
-			displayRecipe(data.title, "Jeanine", new Date(), data.rating, data.tags, data.description, data.ingredients, data.steps, data.comments);
+			displayRecipe(data.title,await getUsernameFromId(data.creator_id), new Date(), data.rating, data.tags, data.description, data.ingredients, data.steps, data.comments);
 		}
 
 		(async () => {

@@ -144,11 +144,13 @@ Format de la réponse:
 	"tags":["tag1","tag2"],
 	"steps":["step1","step2",...],
 	"ingredients":["ingredient1","ingredient2",...],
+    "creator_id":"id of creator",
 	"creation_time":"2020-11-01T01:45:01.758Z" // something in this format, can be parsed with new Date(format)
 	"comments":[
 		{
 			"name":"name of the commenter",
-			"userid":"id of the commenter"
+			"creation_time":"2020-11-01T23:51:15.760Z",
+			"userid":"id of the commenter",
 			"content":"content of the comment"
 		},
 		...
@@ -197,7 +199,7 @@ Format de la réponse: `{"name":"name"}`
 
 ------
 
-POST `/q?type=new_recipe` (implémentation non terminée)
+POST `/q?type=make_recipe`
 
 Permet de créer une nouvelle recette. Le body de la requête POST doit utiliser le format JSON (`Content-Type:application/json`)
 
@@ -209,17 +211,21 @@ Le format du body est le suivant:
 	"description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
 	"tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
 	"ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
-	"steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Basic markdown formatting is supported (*bold*, ~strike~, # title)
+	"steps":["Mix stuff","Heat it",...], // must not be empty, max length = 100, max length of a step: 1000 characters. Everything is allowed. Some custom formatting is supported (*bold*, ~strike~)
 }
 ```
 
-Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "desert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
+Tous les champs sont obligatoires. Les contraintes sont vérifiés côté serveur. En cas de non-respect des contraintes ,le serveur renverra une erreur et la recette ne sera pas créée. Je conseille que les tags puissent être choisis depuis un menu déroulant pour forcer l'utilisateur à classer son plat dans la catégorie "plat principal" ou "dessert", etc... pour faciliter la recherche. Si l'utilisateur n'est pas connecté ou ne possède pas le droit "new_recipe", la recette ne sera pas créée.
 
 En cas de succès, la réponse sera: `{"id":"id"}` où `id` est l'identifiant de la recette créée.
 
 ------
 
-POST `/q?type=delete_recipe` (implémentation non terminée)
+POST `/q?type=delete_recipe&id=id`
+
+Supprime la recette dont l'id est id si les droits de l'utilisateur effectuant la recette sont suffisant.
+
+Retourne: `{msg:OK}` en cas de succès
 
 ------
 
@@ -227,11 +233,15 @@ POST `/q?type=new_comment` (implémentation non terminée)
 
 ------
 
-POST `/q?type=delete_commant` (implémentation non terminée)
+POST `/q?type=delete_comment` (implémentation non terminée)
 
 ------
 
-POST `/q?type=rate` (implémentation non terminée)
+POST `/q?type=rate&id=id&rate=rate`
+
+Permet à un utilisateur de noter une recette. id est l'id de la recette à noter. rate est un nombre entre 0 et 5 inclus correspondant à la note donnée par l'utilisateur. Si l'utilisateur a déjà noté la recette, cette url modifiera la note précédente.
+
+Retourne: `{msg:OK}` en cas de succès
 
 ------
 
@@ -241,8 +251,18 @@ Les url présentées sont définitives, les champs ne le sont pas: Un champ util
 
 N'importe quel endpoint est susceptible de générer une erreur lorsqu'il est appelé. Dans ce cas, il retournera un objet de la forme `{error:"Description of the error"}`. La description de l'erreur ne dévoile aucune information confidentielle sur la structure de la backend. Des exemples d'erreurs sont: `database not ready. Please wait a bit.`  ou `type option not recognized`
 
+-------
+
+Liste des droits des utilisateurs
+
+- Par défaut, un utilisateur non connecté peut voir toutes les recettes et les commentaires.
+- Un utilisateur connecté peut commenter les recettes, les notés et supprimer les commentaire qu'il a créé et supprimer les recettes qu'il a crée.
+- `make_recipe` donne le droit de créé des recettes
+- `delete_recipe` donne le droit de supprimer n'importe quelle recette du site
+- `delete_comment` donne le droit de supprimer n'importe quel commentaire du site
+
 ## Sécurité
 
-Les mots de passe sont stockés hachés 30 fois avec du sel de qualité aléatoire cryptographique avec du sha256, selon un algorithme évitant le parcours de cycle large. Les requêtes sont effectués depuis du JS avec du NoSQL ce qui limite les possibilités d'injection. Le type de toute les variables provenant de l'utilisateur est vérifié pour voir si c'est bien "string". Le contenu affiché à l'utilisateur et stocké dans la base de données est déjà rendu sain pour que l'on puisse distribuer le contenu de la base de données sans traitement supplémentaire. L'assainissement des données s'effectue à l'écriture, pas à la lecture, en particulier l'évasion des tags `HTML`.
+Les mots de passe sont stockés hachés 30 fois avec du sel de qualité aléatoire cryptographique avec du sha256, selon un algorithme évitant le parcours de cycle large. Les requêtes sont effectués depuis du JS avec du NoSQL ce qui limite les possibilités d'injection. Le type de toute les variables provenant de l'utilisateur est vérifié pour voir si c'est bien "string". Le contenu stocké dans la base de donnée peut contenir des caractères du type `>` ou `<`. C'est au front-end de retirer ces caractères et d'appliquer des traitements de style. L'assainissement des données s'effectue côté client à la lecture, en particulier l'évasion des tags `HTML`.
 
 Attention, lors du déploiement, le port permettant d'accéder à l'interface HTTP d'administration de la base de données ne doit pas être accessible. De même pour le port permettant de connecter d'autres serveurs pour la réalisation de clusters. Il faut donc bien indiquer les options `-no-http-admin` et mettre `db_port` et `db_port+1`à des ports inaccessibles depuis l'extérieur. (27017 et 27018 par défaut)

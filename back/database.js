@@ -158,6 +158,13 @@ module.exports.setup = (c,callback) => {
 function send_error(res,msg){
 	res.send({'error':msg});
 }
+function send_response(res,result){
+	if(result.error !== null){
+		send_error(res,result.error);
+	}else{
+		res.send(result.result);
+	}
+}
 
 // -------------------------------------------------------
 // Endpoint definitions here.
@@ -178,11 +185,7 @@ module.exports.handle_query = async (req,res) => {
 		let search = req.query.s;
 
 		let result = await rw.retreive_recipes(tags,search,rethinkdb);
-		if(result.error){
-			send_error(res,result.error);
-		}else{
-			res.send(result.result);
-		}
+		send_response(res,result);
 	// -----------------------------------------------
 	}else if(req.query.type === "recipe"){
 		let id = req.query.id;
@@ -191,11 +194,7 @@ module.exports.handle_query = async (req,res) => {
 			return;
 		}
 		let result = await rw.retreive_recipe_by_id(id,rethinkdb);
-		if(result.error){
-			send_error(res,result.error);
-		}else{
-			res.send(result.result);
-		}
+		send_response(res,result);
 	// -----------------------------------------------
 	}else if(req.query.type === "unlog"){
 		req.session.destroy(() => {
@@ -236,12 +235,7 @@ module.exports.handle_query = async (req,res) => {
 			return;
 		}
 		let result = await rw.retreive_user_by_id(id,rethinkdb);
-		if(result.error){
-			send_error(res,result.error);
-		}else{
-			res.send({"name":result.result.name});
-		}
-
+		send_response(res,result);
 	}else{
 		send_error(res,"type option not recognized");
 	}
@@ -251,7 +245,11 @@ module.exports.handle_post_query = async (req,res) => {
 		send_error(res,"database not ready. Please wait a bit.");
 		return;
 	}
-	if(req.query.type === "new_recipe"){
+	if(req.query.type === "make_recipe"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
 		let body = req.body + "";
 		if(body.length >= 100000){ // basic ddos protection.
 			send_error(res,'body is too big.');
@@ -263,8 +261,24 @@ module.exports.handle_post_query = async (req,res) => {
 			send_error(res,"invalid json in body.");
 			return;
 		}
-		// check types of body.
-		res.send({msg:"feature not added yet",data:body});
+		// create_recipe should check the types of everything.
+		let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,rethinkdb);
+
+		send_response(res,result);
+	}else if(req.query.type === "delete_recipe"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+
+		send_response(res,await rw.delete_recipe(req.session.user_id,req.query.id,rethinkdb));
+	}else if(req.query.type === "rate"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+
+		send_response(res,await rw.rate_recipe(req.session.user_id,req.query.id,req.query.rate,rethinkdb));
 	}else{
 		send_error(res,"type option not recognized");
 	}

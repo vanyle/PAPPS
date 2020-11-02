@@ -10,6 +10,7 @@
 	"dependencies": {
 		"express": "^4.17.0",
 		"express-session": "^1.17.1",
+		"node-netstat": "^1.8.0",
 		"rethinkdbdash": "^2.3.31",
 		"session-rethinkdb": "^2.0.1",
 		"sha.js": "^2.4.11"
