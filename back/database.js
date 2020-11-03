@@ -287,15 +287,65 @@ module.exports.handle_post_query = async (req,res) => {
 			send_error(res,"you need to be logged in to perform this request");
 			return;
 		}
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided");
+			return;
+		}
+		send_response(res,await rw.delete_recipe(req.session.user_id,id,rethinkdb));
+	}else if(req.query.type === "make_comment"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+		let body = req.body + "";
+		if(body.length >= 100000){ // basic ddos protection.
+			send_error(res,'body is too big.');
+			return;
+		}
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided");
+			return;
+		}
+		try{
+			body = JSON.parse(body);
+		}catch(err){
+			send_error(res,"invalid json in body.");
+			return;
+		}
 
-		send_response(res,await rw.delete_recipe(req.session.user_id,req.query.id,rethinkdb));
+		let result = await rw.create_comment(req.session.user_id,id,body.content,rethinkdb);
+		send_response(res,result);
+	}else if(req.query.type === "delete_comment"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided");
+			return;
+		}
+		let cid = req.query.cid;
+		if(typeof cid !== "string" || cid.length < 1){
+			send_error(res,"cid not provided");
+			return;
+		}
+		send_response(res,await rw.delete_comment(req.session.user_id,id,cid,rethinkdb));
 	}else if(req.query.type === "rate"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");
 			return;
 		}
+		let id = req.query.id;
+		if(typeof id !== "string" || id.length < 1){
+			send_error(res,"id not provided");
+			return;
+		}
 
-		send_response(res,await rw.rate_recipe(req.session.user_id,req.query.id,req.query.rate,rethinkdb));
+		// at this point, rate is a string, rate_recipe checks that it's a valid nuber
+		send_response(res,await rw.rate_recipe(req.session.user_id,id,req.query.rate,rethinkdb));
 	}else{
 		send_error(res,"type option not recognized");
 	}

@@ -10,6 +10,19 @@ function sha256(msg){
 	return shajs('sha256').update(msg).digest('hex');
 }
 
+
+// Return a UUID compliant with RFC 4122.
+function uuid(){
+	function rnd(){ // return a random integer between 0 and 15
+		return crypto.randomBytes(1)[0] & 0xF;
+	}
+
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		let r = rnd(), v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
+}
+
 // Low level functions
 
 const LOWERCASE_CHARS = 'abcdefghijklmnopqrstuvwxyzáàâäãåæçéèêëìíîïðñòóôõöøùúûüýÿāăąęćĉċčłşśźżµß';
@@ -140,7 +153,6 @@ module.exports.create_image = async (data,rethinkdb) => {
 }
 
 module.exports.create_recipe = async (user_id,title,description,tags,ingredients,steps,image_id,r) => {
-	// TODO: add safety checks for the types provided.
 	return new Promise((resolve) => {
 		r.table("users").get(user_id).run((err,result) => {
 			if(result === null){
@@ -244,6 +256,8 @@ module.exports.delete_recipe = (user_id,recipe_id,r) => {
 					return;
 				}
 
+				// TODO: delete images associated with recipe ?
+
 				r.table("recipes").get(recipe_id).delete().run((err,result) => {
 					if(err !== null){
 						resolve({error:"unable to delete data from db, please retry."});
@@ -304,8 +318,15 @@ module.exports.rate_recipe = (user_id,recipe_id,new_rating,r) => {
 }
 
 module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
-	// TODO: add more checks on comment_content to prevent XSS.
 	return new Promise((resolve) => {
+		if(typeof user_id !== "string" || typeof recipe_id !== "string"){
+			resolve({error:"bad get arguments",result:null});
+			return;
+		}
+		if(typeof comment_content !== "string" || comment_content.length > 1000){
+			resolve({error:"bad comment content",result:null});
+			return;
+		}
 		r.table("recipes").get(recipe_id).run((err,recipe_data) => {
 			if(err != null){
 				console.log(err.message);
@@ -326,7 +347,9 @@ module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
 					resolve({error:"no user with the given id exists"});
 					return;
 				}
+
 				const new_comment = {
+					id: uuid(),
 					name: user_data.name,
 					user_id: user_data.id,
 					content: comment_content,
@@ -340,12 +363,61 @@ module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
 				    	resolve({error:"unable to update db, please retry",result:null});
 				    	return;
 					}
-					resolve({error:null,result:res});
+					resolve({error:null,result:{id:new_comment.id}});
 				})
 			});
 		});
 	});
 };
+
+module.exports.delete_comment = (user_id,recipe_id,comment_id,r) => {
+	return new Promise((resolve) => {
+		r.table("users").get(user_id).run((err,user) => {
+			if(user === null){
+				resolve({error:"no user with the given id exists"});
+				return;
+			}
+			r.table("recipes").get(recipe_id).run((err,recipe) => {
+				if(recipe === null){
+					resolve({error:"no recipe with the given id exists"});
+					return;
+				}
+				let comment = null;
+				// retreive the comment.
+				for(let i = 0;i < recipe.comments.length;i++){
+					if(recipe.comments[i].id === comment_id){
+						comment = i;
+						break;
+					}
+				}
+				if(comment === null){
+					resolve({error:"no comment with the given id exists"});
+					return;
+				}
+
+				let isAllowed = comment.user_id === user_id || (user.rights.indexOf('delete_comment') !== -1);
+
+				if(!isAllowed){
+					resolve({error:"user is not allowed to delete this comment"});
+					return;
+				}
+
+				// attempt to delete the comment if it still exist. (remember that all of this is async)
+				r.table("recipes").get(recipe_id).update({
+					comments: r.row("comments").delete(
+							r.row("comments").offsetsOf((comment_element) => {return comment_element.id = comment_id}).nth(0)
+					)
+				}).run((err,result) => {
+					if(err !== null){
+						resolve({error:"unable to delete comment from db, please retry."});
+					}else{
+						resolve({error:null,result:{'msg':'OK'}});
+					}
+				});
+			});
+		});
+	});
+}
 
 module.exports.retreive_recipes = (tags,search,r) => {
 	return new Promise((resolve) => {
@@ -379,9 +451,9 @@ module.exports.retreive_recipes = (tags,search,r) => {
 		query = query.withFields('id','title','description','rating','tags');
 		query = query.limit(100);
 
-		query = query.orderBy(function(recipe){
-			return recipe('rating').avg('note').default(2.5)
-		});
+		query = query.orderBy(r.desc(function(recipe){
+			return recipe('rating').avg('note').default(2.5) // - sign for desc
+		}));
 
 		// compute ratings
 		query = query.merge(function(rec){return {rating:rec('rating').avg('note').default(2.5)}})

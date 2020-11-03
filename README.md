@@ -218,7 +218,7 @@ Le format du body est le suivant:
 ```js
 {
 	"title":"title", // max length = 100 characters All UTF8 is allowed (including emojis)
-	"description":"description", // max length = 600 characterss. All UTF8 is allowed (including emojis)
+	"description":"description", // max length = 600 characters. All UTF8 is allowed (including emojis)
 	"image":"<img data>", // filecontent of an image, as base64 encoding.
      "tags":["tag1","tag2"] // 6 tags max, max length of a tag = 50 characters. Must only contain lowercase letters (special characters like é,ż or ę are allowed) and spaces,
 	"ingredients":["ingredient1","ingredient2",...], // must not be empty, max length = 100, max length of an ingredient: 200 characters. Only numbers, lowercase and uppercase letters and spaces are allowed and currency signs (€ or ¥)
@@ -242,11 +242,25 @@ Retourne: `{msg:OK}` en cas de succès
 
 ------
 
-POST `/q?type=make_comment` (implémentation non terminée)
+POST `/q?type=make_comment&id=id`
+
+Crée un commentaire sur le recette dont l'id est id. Le format du body est le suivant:
+
+```js
+{
+	"content":"The content of the comment." // max length = 1000 characters
+}
+```
+
+En cas de succès, la réponse sera `{"id":"id"}` où `id` est l'identifiant du commentaire créé
 
 ------
 
-POST `/q?type=delete_comment` (implémentation non terminée)
+POST `/q?type=delete_comment&id=id&cid=id`
+
+Supprime le commentaire avec l'id `cid` sur la recette `id` (si les droits de l'utilisateur effectuant la recette sont suffisant)
+
+Retourne: `{msg:OK}` en cas de succès
 
 ------
 

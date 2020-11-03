@@ -16,5 +16,7 @@ module.exports = {
 	"https_secret":"./secret/",
 	"session_secret":"rejdkfzps5688234", // must we changed when in production for security reasons. Must be the same for all nodes in the cluster
 
-	"put_fake_data":true
+	"oauth_secret":"./secret/oauth.json",
+
+	"put_fake_data":false
 }

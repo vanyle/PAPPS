@@ -162,6 +162,29 @@ module.exports.populate_db = async (r) => {
 							}
 						});
 					}
+
+					// add ratings!
+					// small number of rating (7) to avoid central limit theorem and have 0 or 5 star rating in test dataset.
+					let rating_number = seeded_random() % 7;
+					if(rating_number > 0){
+						r.table('users').sample(rating_number).run(async (err,picked_users) => {
+							if(err){
+								console.log(err);
+								return;
+							}
+							if(!(picked_users instanceof Array)) return;
+
+							for(let k = 0;k < picked_users.length;k++){
+								let nbr = 6;
+								while(nbr > 5){
+									nbr = seeded_random() % 7;
+								}
+
+								rw.rate_recipe(picked_users[k].id,recipe_id,nbr,r);
+							}
+						});
+					}
+
 				}else{
 					console.log("Error while generating recipe: "+result.error);
 				}
