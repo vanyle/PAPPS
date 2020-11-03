@@ -1,6 +1,7 @@
 class StarRating {
-  constructor(container, rating = 0) {
+  constructor(container, rating = 0,id = null) {
     this.container = container;
+    this.recipeId = id;
     this.votedRating = 0;
     this.setGraphics();
     this.setRating(rating);
