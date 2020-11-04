@@ -52,13 +52,25 @@ async function loadRecipeList() {
 	//show recipes
     showRecipes(recipesList);
 
-     recipe_search_dom.addEventListener('keydown',async (e) => {
-        //if(e.key === "Enter"){}
-        let query = recipe_search_dom.value;
-        displayLoadCardList();
-        var recipesList = await get_recipes_from_search(query);
-        resetRecipeCardList();
-        showRecipes(recipesList);
+    // When the user types, start the timeout
+    // As long as the user type, keep reseting the timeout.
+    // If the user has not pressed a key for 500ms, start the search.
+
+    let searchTimeout = null;
+    recipe_search_dom.addEventListener('keydown',async (e) => {
+        if(searchTimeout !== null){
+            clearTimeout(searchTimeout);
+        }
+
+        displayLoadCardList(); // pretend to start loading stuff.
+
+        searchTimeout = setTimeout(async () => {
+            // start search.
+            let query = recipe_search_dom.value;
+            var recipesList = await get_recipes_from_search(query);
+            resetRecipeCardList();
+            showRecipes(recipesList);
+        },500);
     });
 }
 

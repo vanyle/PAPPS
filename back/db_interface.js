@@ -444,8 +444,9 @@ module.exports.retreive_recipes = (tags,search,r) => {
 				resolve({err:"query too long",result:null});
 				return;
 			}
+			search = search.toLowerCase(); // lowercase match.
 			query = query.filter((doc) => {
-				return doc('title').match(search).or(doc('description').match(search));
+				return doc('title').downcase().match(search).or(doc('description').match(search));
 			});
 		}
 		query = query.withFields('id','title','description','rating','tags','image_id');

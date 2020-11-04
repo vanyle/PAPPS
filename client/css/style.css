@@ -52,14 +52,23 @@ nav{
 	position:relative;
 }
 nav > *{
-	font-size: max(1.5vw,7px);
 	padding-top:1.5%;
+	/* Center text inside the boxes*/
+	display:flex;
+	text-align:center;
+	align-items:center;
+
 	padding-bottom:1.5%;
 	padding-right:10px;
 	padding-left: 10px;
+
+	/* Manage how the boxes are positioned relative to each other */
 	margin-bottom:-1px;
 	margin-left:1vw;
 	margin-right:1vw;
+
+	/* General appearance */
+	font-size: max(1.5vw,12px);
 	color: #000;
 	border-radius: 10px 10px 0 0; /* upper side is rounded */
 	text-transform: uppercase;
