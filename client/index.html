@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
 	<link href='css/style.css' rel='stylesheet'/>
 	<link href='css/list-recipes.css' rel='stylesheet'/>
+	<link href='css/recipe.css' rel='stylesheet'/>
 	<script src="js/sections.js"></script>
 	<script src="js/star.js"></script>
 </head>
@@ -30,11 +31,69 @@
 		</div>
 
 		<div class='new block'>
-			<p>Crée ta recette !</p>
+			<h1>Crée ta recette !</h1>
+			<div class='recipe-creator'>
+				<form>
+					<input maxlength="100" id="title_input_dom" type="text" placeholder="Titre"/>
+					<textarea id="description_input_dom" placeholder="Description"></textarea>
+					<input type="file" accept="image/png, image/jpeg" placeholder="Une image de la recette"/>
+					
+					<select>
+						<option>dessert</option>
+						<option>plat principal</option>
+						<option>petit déjeuné</option>
+						<option>vegan</option>
+						<option>sucré</option>
+						<option>rapide</option>
+						<option>exotique</option>
+						<option>facile</option>
+						<option>classe</option>
+					</select>
+					<button>Ajouter un tag</button>
+
+					<input type="text" placeholder="Ingrédient"/>
+					<button>Ajouter un ingredient</button>
+
+					<textarea placeholder="Une étape"></textarea>
+					<button>Ajouter une étape à la recette</button>
+
+				</form>
+				<div class='recipe-preview'>
+					<div class="recipe-image-container">
+						<img class="recipe-image" width="800" height="600" src="media/test_img_recette.jpeg" alt="Photo recette"/>
+						<h2 class="recipe-title">Titre</h2>
+					</div>
+					<div class="recipe-info recipe-part">
+						<div class="recipe-info-top">
+							<span class="recipe-info-author"><a class='recipe-author' href="http://linkcs.fr" data-username=""></a><span class='recipe-time'></span></span>
+							<div id="recipe-star-rating-container"></div>
+						</div>
+						<p class="recipe-description">Description</p>						
+					</div>
+					<div class="recipe-ingredients recipe-part">
+						<span class="recipe-ingredients-title">Ingrédients</span>
+						<ul class="recipe-ingredients-list">
+						</ul>
+					</div>
+
+					<div class="recipe-steps recipe-part">
+						<span class="recipe-steps-title">Étapes</span>
+						<ol class="recipe-steps-list">
+						</ol>
+					</div>
+
+					<div class="recipe-tag-container recipe-part">
+						<span>Tags :</span>
+						<div class="recipe-tags-list">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class='force_center'><button class='publish'>Publier ma recette !</button></div>
 		</div>
 
 		<div class='shop block'>
-			<p>Liste de courses.</p>
+			<h1>Ma liste de courses</h1>
 		</div>
 
 		<div class='me block'>

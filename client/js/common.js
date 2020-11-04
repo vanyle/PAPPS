@@ -26,7 +26,7 @@ let sections = [
 		"name":"new",
 		"display":"Créer une recette",
 		"auth":"make_recipe",
-		"file":null
+		"file":"new_section.js"
 	},
 	{
 		"name":"shop",
@@ -57,7 +57,7 @@ async function build_header(){
 
 	for(let i in sections){
 		let current = sections[i];
-		let el = document.createElement(current.span ? "span" : "a");
+		let el = document.createElement("a");
 		
 		if(window.notIndexHTML){
 			el.href = '/index.html#' + current.name;

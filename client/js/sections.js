@@ -27,6 +27,26 @@ function get_website(url){
 	});
 }
 
+// Makes a post request to url with the body body (that is a json object)
+// Returns the response of the website
+function post_website(url,body){
+	return new Promise( (resolve) => {
+		let httpRequest = new XMLHttpRequest();
+		httpRequest.onreadystatechange = () => {
+			if(httpRequest.readyState === XMLHttpRequest.DONE){
+				resolve(httpRequest.responseText);
+			}
+		};
+		httpRequest.open('POST', url, true);
+		httpRequest.setRequestHeader('Content-Type', 'application/json');
+		if(body !== null){
+			httpRequest.send(JSON.stringify(body));
+		}else{
+			httpRequest.send("");
+		}
+	});
+}
+
 // The methods below provide a full implementation of most of the requests available.
 
 async function get_all_recipes(){
@@ -72,6 +92,30 @@ async function deconnect(){
 	if(content.error) return false;
 
 	return content;
+}
+
+async function post_comment(recipeId,commentContent){
+	let result = JSON.parse(await post_website("/q?type=make_comment&id="+recipeId,{content:commentContent}));
+	if(result.error){
+		console.error("Unable to post comment: ",result.error);
+		return false;
+	}
+	return result;
+}
+async function delete_comment(recipeId,commentId){
+	let result = JSON.parse(await post_website("/q?type=delete_comment&id="+recipeId+"&cid="+commentId,null));
+	if(result.error){
+		console.error("Unable to delete comment: ",result.error);
+		return false;
+	}
+	return result;
+}
+
+// -----------------------------------------------------
+// This function displays messages in an alert style way but less aggresivly.
+// It supports HTML styling and requires no CSS. It's standalone and very useful!
+function toast(msg){
+	alert(msg);
 }
 
 // -----------------------------------------------------

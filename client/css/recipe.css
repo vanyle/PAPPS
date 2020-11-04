@@ -27,7 +27,7 @@ img[src]::after {
   position: relative;
 }
 
-.recipe-title {
+.recipe-title{
   font-size: 4vw;
   position: relative;
   bottom: 8vw;
@@ -38,6 +38,9 @@ img[src]::after {
   width: max-content;
   /* needs a text shadow to be visible on all background colors */
   text-shadow: #000 1px 1px 5px;
+}
+.recipe-title *{
+  font-size: 4vw;
 }
 
 .recipe-info-top {
@@ -126,6 +129,18 @@ img[src]::after {
   margin-bottom: 10px;
 }
 
+.force-right{
+  display:flex;
+  flex-direction:row-reverse;
+}
+form{
+  width:100%;
+}
+#comment_preview_dom{
+  display:block;
+  padding:10px;
+}
+
 .comment {
   /*background-color: #EEE;*/
   /*border-bottom:1px solid #000;*/
@@ -147,4 +162,7 @@ img[src]::after {
 .comment-content {
   text-indent: 20px;
   text-align: justify;
+}
+.comment-content *{
+  text-indent: 0px;
 }

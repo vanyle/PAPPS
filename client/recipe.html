@@ -51,7 +51,16 @@
 		</div>
 
 		<div class="recipe-comments-container">
-			<span class="recipe-comments-title">Commentaires</span>
+			<form data-require-auth='basic'>
+				<textarea minlength="1" rows="4" maxlength="1000" id="comment_dom" placeholder="Ecrire un commentaire"></textarea>
+				<div class='force-right'>
+					<button id="publish_dom" class='publish'>Publier</button>
+				</div>
+				<div id='comment_preview_dom'>Aperçu de votre commentaire:</div>
+				<div id='formated_comment'></div>
+			</form>
+
+			<div class="recipe-comments-title">Commentaires</div>
 			<div id="recipe-comments-list">
 
 			</div>
@@ -99,7 +108,15 @@
 			var commentsContainer = document.querySelector("#recipe-comments-list");
 			var htmlToAdd = '<div class="comment"> <div class="comment-top">'
 			htmlToAdd += '<span class="comment-username">' + text_formatter(comment.name) + '</span>';
-			htmlToAdd += '<span class="comment-date">le jeudi 25 juillet 2030</span></div>';
+			htmlToAdd += '<span class="comment-date">';
+
+			console.log(comment);
+
+			if(auth && (comment.user_id === auth.id || auth.rights.indexOf('delete_comment') !== -1)){
+				htmlToAdd += "<button class='delete_comment_button small' data-cid='" + comment.id + "'><i class='fa fa-trash'></i></button>";
+			}
+
+			htmlToAdd +=  formatTime(new Date(comment.creation_time)) + '</span></div>';
 			htmlToAdd += '<p class="comment-content">' + text_formatter(comment.content) + '</p></div>';
 
 			commentsContainer.innerHTML += htmlToAdd;
@@ -193,6 +210,46 @@
 					data.comments
 				);
 			}
+
+			// manage comment writing:
+			publish_dom.style.display = 'none';
+			comment_preview_dom.style.display = 'none';
+			comment_dom.addEventListener('keyup',() => {
+				formated_comment.innerHTML = text_formatter(comment_dom.value);
+				if(comment_dom.value.length > 0){
+					publish_dom.style.display = '';
+					comment_preview_dom.style.display = '';
+				}else{
+					comment_preview_dom.style.display = 'none';
+					publish_dom.style.display = 'none';
+				}
+			});
+			publish_dom.addEventListener('click',async (e) => {
+				e.preventDefault();
+				let comment_content = comment_dom.value;
+				let res = await post_comment(id,comment_content);
+				if(res){
+					location.reload();
+				}else{
+					comment_dom.value = "";
+					toast("Impossible de poster le commentaire.");
+				}
+			});
+			document.querySelectorAll(".delete_comment_button").forEach((button) => {
+				button.addEventListener('click',async function(){
+					let cid = this.getAttribute('data-cid');
+					console.log(cid);
+					let res = await delete_comment(id,cid);
+					console.log(res);
+					if(res){
+						location.reload();
+					}else{
+						toast("Impossible supprimer le commentaire.");
+					}
+				});
+			})
+
+
 		}
 
 		set_load_section_event('recipe',loadRecipe);

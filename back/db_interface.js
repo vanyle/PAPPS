@@ -333,6 +333,7 @@ module.exports.create_comment = (user_id,recipe_id,comment_content,r) => {
 		    	resolve({error:"unable to retreive db results, please retry",result:null});
 		    	return;
 			}
+
 			if(recipe_data === null){
 				resolve({error:"no recipe with the given id exists"});
 				return;
@@ -386,7 +387,7 @@ module.exports.delete_comment = (user_id,recipe_id,comment_id,r) => {
 				// retreive the comment.
 				for(let i = 0;i < recipe.comments.length;i++){
 					if(recipe.comments[i].id === comment_id){
-						comment = i;
+						comment = recipe.comments[i];
 						break;
 					}
 				}
@@ -395,7 +396,7 @@ module.exports.delete_comment = (user_id,recipe_id,comment_id,r) => {
 					return;
 				}
 
-				let isAllowed = comment.user_id === user_id || (user.rights.indexOf('delete_comment') !== -1);
+				let isAllowed = (comment.user_id === user_id) || (user.rights.indexOf('delete_comment') !== -1);
 
 				if(!isAllowed){
 					resolve({error:"user is not allowed to delete this comment"});
@@ -404,11 +405,12 @@ module.exports.delete_comment = (user_id,recipe_id,comment_id,r) => {
 
 				// attempt to delete the comment if it still exist. (remember that all of this is async)
 				r.table("recipes").get(recipe_id).update({
-					comments: r.row("comments").delete(
-							r.row("comments").offsetsOf((comment_element) => {return comment_element.id = comment_id}).nth(0)
-					)
+					comments: r.row("comments").filter((comment_element) => {
+						return comment_element("id").ne(comment_id);
+					})
 				}).run((err,result) => {
 					if(err !== null){
+						console.log(err.message);
 						resolve({error:"unable to delete comment from db, please retry."});
 					}else{
 						resolve({error:null,result:{'msg':'OK'}});
