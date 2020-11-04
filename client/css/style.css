@@ -7,7 +7,7 @@ body,html{
 	padding:0;
 	font-weight:400;
 	box-sizing:border-box;
-	font-size:20px;
+	font-size: max(15px,1.5vw); /* Text gets smaller on smaller screens up to a point */
 	transition:500ms;
 	font-family:sans-serif;
 }
@@ -52,7 +52,7 @@ nav{
 	position:relative;
 }
 nav > *{
-	font-size: 1.5vw;
+	font-size: max(1.5vw,7px);
 	padding-top:1.5%;
 	padding-bottom:1.5%;
 	padding-right:10px;
@@ -69,6 +69,9 @@ nav > a:hover{
 	cursor: pointer;
 	color: #000;
 	background-color: rgb(255, 157, 0);
+}
+[data-show]{
+	cursor:pointer;
 }
 header > span{
 	position:absolute;
@@ -100,6 +103,7 @@ a:hover{
 	padding:10px;
 	position: relative;
 	width:80%;
+	display:none; /*no display by default, all sections are hidden */
 	margin:auto;
 }
 button{

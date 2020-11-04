@@ -20,21 +20,16 @@ function resetRecipeCardList(){
 function buildRecipeCard(id, title, description, image, rating = 0) {
     var elemHTML = '<a class="recipe-card-link" href="recipe.html?id=' + id + '">';
     elemHTML += '<div class="list-card" id="' + id + '">';
-    elemHTML += '<img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/>';
+    elemHTML += '<div class="list-recipe-image-container"><img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/></div>';
     elemHTML += '<div class="list-recipe-info-container"><div class="list-recipe-info-top"> <h3 class="list-recipe-title">' + title + '</h3>';
     elemHTML += '<div class="sc" data-id="' + id + '" data-rating="' + rating + '"> </div> </div><p class="list-recipe-description">' + description + '</p> </div> </div></a>';
     return elemHTML;
 }
 
-
-async function loadRecipeList() {
-	displayLoadCardList();
-	var recipeList = await get_all_recipes();
-    resetRecipeCardList();
-	//show recipes
+function showRecipes(recipeList){
     var recipesHTML = "";
-	recipeList.forEach((recipe, i) => {
-        recipesHTML += buildRecipeCard(recipe.id, recipe.title, recipe.description,"media/paps.png",recipe.rating/5);
+    recipeList.forEach((recipe, i) => {
+        recipesHTML += buildRecipeCard(recipe.id, recipe.title, recipe.description,"/q?type=image&id="+recipe.image_id,recipe.rating/5);
     });
     // update dom only once for better perf
     document.querySelector("#recipe-list-container").innerHTML = recipesHTML;
@@ -46,6 +41,24 @@ async function loadRecipeList() {
                 let id = element.getAttribute('')
             });
         }
+    });
+}
+
+async function loadRecipeList() {
+    recipe_search_dom.value = "";
+	displayLoadCardList();
+	var recipesList = await get_all_recipes();
+    resetRecipeCardList();
+	//show recipes
+    showRecipes(recipesList);
+
+     recipe_search_dom.addEventListener('keydown',async (e) => {
+        //if(e.key === "Enter"){}
+        let query = recipe_search_dom.value;
+        displayLoadCardList();
+        var recipesList = await get_recipes_from_search(query);
+        resetRecipeCardList();
+        showRecipes(recipesList);
     });
 }
 

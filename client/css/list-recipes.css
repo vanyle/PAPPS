@@ -3,29 +3,36 @@
   border-radius: 5px;
   border: 1px solid #EEE;
   display: flex;
-  transition: 500ms;
+  flex-wrap: wrap;
+  /*transition: 500ms;*/
   margin-top: 10px;
   margin-bottom: 10px;
 }
-
 .list-card:hover {
   transform: scale(1.05);
   cursor: pointer;
   background-color: #DDD;
 }
 
+.list-recipe-image-container{
+  flex: 3 1 30ch;
+  height:150px;
+  overflow: hidden;
+}
+
 .list-recipe-image {
-  width: 150px;
-  height: 150px;
-  background-color: white;
+  max-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  object-position: 50% 50%;
+  background-color:white;
 }
 
 .list-recipe-info-container {
-  display: flex;
-  flex-direction: column;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  width: 100%;
+  padding: 16px 3vw;
+  flex: 4 1 40ch;
 }
 
 .list-recipe-info-top {
@@ -37,18 +44,23 @@
 
 .list-recipe-title {
   font-weight: bold;
-  text-align: left;
-  font-size: 22px;
+  margin: 0;
+  font-size: clamp(1.4em, 2.1vw, 2.1em);
+  font-family: "Roboto Slab", Helvetica, Arial, sans-serif;
 }
 
 .list-recipe-description {
   font-size: 18px;
 }
-
+.sc{ /* rating container */
+  margin: 0;
+  font-size: 1.2em;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
 .empty-star-container {
   position: absolute;
 }
-
 .full-star-container {
   position: relative;
   width: max-content;

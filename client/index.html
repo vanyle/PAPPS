@@ -4,7 +4,7 @@
 	<title>PAPS'APP</title>
 	<meta charset="utf8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
-	<link href='style.css' rel='stylesheet'/>
+	<link href='css/style.css' rel='stylesheet'/>
 	<link href='css/list-recipes.css' rel='stylesheet'/>
 	<script src="js/sections.js"></script>
 	<script src="js/star.js"></script>
@@ -12,15 +12,7 @@
 <body>
 	<header>
 		<img src="media/paps.png" alt="Logo de PAPS" width="100px">
-		<nav>
-			<a data-show='home'>Accueil</a>
-			<a data-show='browse'>Les recettes</a>
-			<a data-require-auth='make_recipe' data-show='new'>Créer une recette</a>
-			<a data-require-auth='basic' data-show='shop'>Liste de courses</a>
-			<a data-require-auth='no' data-show='connect'>Connexion</a>
-			<a data-require-auth='basic' data-show='deconnect'>Déconnexion</a>
-		</nav>
-		<span data-require-auth='basic'>Bienvenue <span data-username=''></span></span>
+		<nav></nav>
 	</header>
 	<div id="content">
 		<div class='home block'>
@@ -33,7 +25,7 @@
 		</div>
 
 		<div class='browse block'>
-			<input type="text" placeholder="Cherche une recette"/>
+			<input type="text" id="recipe_search_dom" placeholder="Cherche une recette"/>
 			<div id="recipe-list-container" class="list-container"></div>
 		</div>
 
@@ -43,6 +35,10 @@
 
 		<div class='shop block'>
 			<p>Liste de courses.</p>
+		</div>
+
+		<div class='me block'>
+			<button class="connect" id="deco_button">Déconnexion</button>
 		</div>
 
 		<div class='connect block'>
@@ -60,7 +56,6 @@
 	</div>
 
 <script src="https://kit.fontawesome.com/a0b8c55906.js" crossorigin="anonymous"></script>
-<script src="recipe_section.js"></script>
-<script src="connect_section.js"></script>
+<script src="js/common.js"></script> <!-- Must be loaded at the end -->
 </body>
 </html>

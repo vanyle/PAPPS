@@ -448,7 +448,7 @@ module.exports.retreive_recipes = (tags,search,r) => {
 				return doc('title').match(search).or(doc('description').match(search));
 			});
 		}
-		query = query.withFields('id','title','description','rating','tags');
+		query = query.withFields('id','title','description','rating','tags','image_id');
 		query = query.limit(100);
 
 		query = query.orderBy(r.desc(function(recipe){
@@ -471,7 +471,7 @@ module.exports.retreive_recipes = (tags,search,r) => {
 module.exports.retreive_recipe_by_id = (id,r) => {
 	return new Promise((resolve) => {
 		let query = r.table("recipes");
-		query = query.get(id);
+		query = query.get(id).merge(function(rec){return {rating:rec('rating').avg('note').default(2.5)}});
 
 		query.run((err,result) => {
 			if(err != null){
@@ -485,6 +485,7 @@ module.exports.retreive_recipe_by_id = (id,r) => {
 			}
 			let toreturn = {}; // field filter. This is performed on a single object, so it's not costly.
 			toreturn.id = result.id;
+			toreturn.image_id = result.image_id;
 			toreturn.title = result.title;
 			toreturn.description = result.description;
 			toreturn.rating = result.rating;
