@@ -49,10 +49,16 @@ async function get_recipe(id){
 }
 
 async function is_login(){
-	let content = JSON.parse(await get_website("/q?type=uinfo"));
-	if(content.error) return false;
+	if(window.auth === undefined){
+		let content = JSON.parse(await get_website("/q?type=uinfo"));
+		if(content.error){
+			window.auth = false;
+		}else{
+			window.auth = content;
+		}
+	}
 
-	return content;
+	return window.auth;
 }
 
 async function login(username,password){

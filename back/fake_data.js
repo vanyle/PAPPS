@@ -111,7 +111,17 @@ module.exports.populate_db = async (r) => {
 	let descriptions = [
 		"Des frites croutillantes pour vos soirées entre amis.",
 		"Une glace à la vanille, idéal à déguster en été !",
-		"Une description provocante et pertinente qui innove"
+		"Une description provocante et pertinente qui innove",
+		"Malicieux <script>alert('a');</script> <img onerror='alert(1)' src='bluck'/>",
+		"Aussi *génial* qu'un ¨Arc-en-ciel!¨ qui }tourne} et qui ¤zoom¤",
+		"@name, tu vas aimer cette recette!",
+		`Cette #recette# > Les autres recettes, c'est de la ~drogue~. \`
+           (__)
+           (oo)
+    /-------\\\\/ 
+   / |     ||  
+  \\*  ||----||  
+     \\~\\~    \\~\\~   \` `
 	];
 
 	let recipe_count = 0;

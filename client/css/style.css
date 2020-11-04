@@ -176,3 +176,67 @@ textarea{
 	padding:10px;
 	margin-bottom:10px;
 }
+/* Text formatting styles */
+pre{
+	font-family: "Lucida Console", Monaco, monospace;
+	line-height: 0.8em;
+}
+.strike{
+	text-decoration:line-through;
+}
+.spin{
+	animation:spin 3s infinite;
+	display:inline-block;
+}
+.bounce{
+	animation:bounce 2s infinite;
+}
+.comic{
+	font-family:"Comic Sans MS";
+}
+.rainbow{
+	background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
+	-webkit-background-clip: text;
+	color: transparent;
+	display:inline-block;
+	background-size:800% 800%;
+	animation:rainbow 2s linear infinite;
+}
+.zoommove{
+	animation:zoommove 1s linear infinite;
+	display:inline-block;
+}
+@keyframes rainbow { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 50%}
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+@keyframes zoommove{
+	from {transform:scale(0.8);}
+    50%  {transform:scale(1.2);}
+    from {transform:scale(0.8);}
+}
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+  40% {
+    -moz-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    -webkit-transform: translateY(-30px);
+    transform: translateY(-30px);
+  }
+  60% {
+    -moz-transform: translateY(-15px);
+    -ms-transform: translateY(-15px);
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+  }
+}

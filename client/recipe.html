@@ -99,23 +99,21 @@
 		async function addComment(comment) {
 			var commentsContainer = document.querySelector("#recipe-comments-list");
 			var htmlToAdd = '<div class="comment"> <div class="comment-top">'
-			htmlToAdd += '<span class="comment-username">' + comment.name + '</span>';
+			htmlToAdd += '<span class="comment-username">' + text_formatter(comment.name) + '</span>';
 			htmlToAdd += '<span class="comment-date">le jeudi 25 juillet 2030</span></div>';
-			htmlToAdd += '<p class="comment-content">' + comment.content + '</p></div>';
+			htmlToAdd += '<p class="comment-content">' + text_formatter(comment.content) + '</p></div>';
 
-			var innerHTML = commentsContainer.innerHTML;
-			innerHTML += htmlToAdd;
-			commentsContainer.innerHTML = innerHTML;
+			commentsContainer.innerHTML += htmlToAdd;
 		}
 
 		function setRecipeTitle(title) {
 			var titleElement = document.querySelector('.recipe-title');
-			titleElement.innerText = title;
+			titleElement.innerText = text_formatter(title);
 		}
 
 		function setRecipeAuthor(author){
 			var authorElement = document.querySelector('.recipe-author');
-			authorElement.innerText = author;
+			authorElement.innerText = text_formatter(author);
 		}
 
 		function setRecipeTime(time){
@@ -126,7 +124,7 @@
 
 		function setRecipeDescription(description) {
 			var descriptionElement = document.querySelector('.recipe-description');
-			descriptionElement.innerHTML = description;
+			descriptionElement.innerHTML = text_formatter(description);
 		}
 
 		function setRecipeImage(image_id){
@@ -135,26 +133,17 @@
 
 		function addIngredient(ingredient) {
 			var ingredientsList = document.querySelector(".recipe-ingredients-list");
-
-			var innerHTML = ingredientsList.innerHTML;
-			innerHTML += "<li>" + ingredient+ "</li>";
-			ingredientsList.innerHTML = innerHTML;
+			ingredientsList.innerHTML += "<li>" + text_formatter(ingredient) + "</li>";
 		}
 
 		function addStep(step) {
 			var stepsList = document.querySelector(".recipe-steps-list");
-
-			var innerHTML = stepsList.innerHTML;
-			innerHTML += "<li>" + step + "</li>";
-			stepsList.innerHTML = innerHTML;
+			stepsList.innerHTML += "<li>" + text_formatter(step) + "</li>";
 		}
 
 		function addTag(tag) {
 			var tagsList = document.querySelector(".recipe-tags-list");
-
-			var innerHTML = tagsList.innerHTML;
-			innerHTML += "<a class='tag'>" + tag + "</a>";
-			tagsList.innerHTML = innerHTML;
+			tagsList.innerHTML += "<a class='tag'>" + tag + "</a>";
 		}
 
 		function displayRecipe(title, author, image_id, date, rating, tags, description, ingredients, steps, comments) {
@@ -207,9 +196,7 @@
 			}
 		}
 
-		(async () => {
-			loadRecipe();
-		})();
+		set_load_section_event('recipe',loadRecipe);
 	</script>
 	<script src="js/common.js"></script> <!-- Must be loaded at the end -->
 </body>
