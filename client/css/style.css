@@ -181,15 +181,20 @@ pre{
 	font-family: "Lucida Console", Monaco, monospace;
 	line-height: 0.8em;
 }
+b{
+	font-weight:bold;
+}
 .strike{
 	text-decoration:line-through;
 }
 .spin{
 	animation:spin 3s infinite;
 	display:inline-block;
+	display:inline-block;
 }
 .bounce{
 	animation:bounce 2s infinite;
+	display:inline-block;
 }
 .comic{
 	font-family:"Comic Sans MS";

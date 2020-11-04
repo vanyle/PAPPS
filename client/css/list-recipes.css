@@ -18,6 +18,7 @@
   flex: 3 1 30ch;
   height:150px;
   overflow: hidden;
+  background-color:white;
 }
 
 .list-recipe-image {
@@ -27,6 +28,15 @@
   height: auto;
   object-fit: cover;
   object-position: 50% 50%;
+  background-color:white;
+}
+img[src]::after {
+  content: '';
+  display: block;
+  max-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
   background-color:white;
 }
 

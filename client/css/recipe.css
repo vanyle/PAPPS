@@ -9,6 +9,13 @@
   object-fit: cover;
   position: relative;
 }
+/* This element is render only if the image is invalid*/
+img[src]::after {
+  content: '';
+  display: block;
+  width: calc(100% + 20px);
+  height: 14vw;
+}
 
 .recipe-blur {
   -webkit-mask: -webkit-linear-gradient(transparent, black 100%);
@@ -42,7 +49,16 @@
   /*text-align: justify;*/ /*Might produce weird spacing between word with 2 line descriptions*/
   text-indent: 40px;
 }
-
+.recipe-description *{
+  text-indent:0px;
+}
+.empty-star-container {
+  position: absolute;
+}
+.full-star-container {
+  position: relative;
+  width: max-content;
+}
 .recipe-steps-list, .recipe-ingredients-list {
   margin: 20px;
 }
@@ -111,8 +127,10 @@
 }
 
 .comment {
-  background-color: #EEE;
+  /*background-color: #EEE;*/
+  /*border-bottom:1px solid #000;*/
   padding: 10px;
+  margin: 10px;
 }
 
 .comment-top {

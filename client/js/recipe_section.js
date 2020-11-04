@@ -21,7 +21,7 @@ function buildRecipeCard(id, title, description, image, rating = 0) {
     console.log(description);
     var elemHTML = '<a class="recipe-card-link" href="recipe.html?id=' + id + '">';
     elemHTML += '<div class="list-card" id="' + id + '">';
-    elemHTML += '<div class="list-recipe-image-container"><img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" width="150px"/></div>';
+    elemHTML += '<div class="list-recipe-image-container"><img class="list-recipe-image" src="' + image +'" alt="Photo de la recette" height="600" width="800"/></div>';
     elemHTML += '<div class="list-recipe-info-container"><div class="list-recipe-info-top"> <h3 class="list-recipe-title">' + text_formatter(title) + '</h3>';
     elemHTML += '<div class="sc" data-id="' + id + '" data-rating="' + rating + '"> </div> </div><p class="list-recipe-description">' + text_formatter(description) + '</p> </div> </div></a>';
     return elemHTML;
