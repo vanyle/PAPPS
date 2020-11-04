@@ -61,9 +61,9 @@ async function loadRecipeList() {
     recipe_search_dom.addEventListener('keydown',async (e) => {
         if(searchTimeout !== null){
             clearTimeout(searchTimeout);
+        }else{
+            displayLoadCardList(); // pretend to start loading stuff.
         }
-
-        displayLoadCardList(); // pretend to start loading stuff.
 
         searchTimeout = setTimeout(async () => {
             // start search.
@@ -71,6 +71,7 @@ async function loadRecipeList() {
             var recipesList = await get_recipes_from_search(query);
             resetRecipeCardList();
             showRecipes(recipesList);
+            searchTimeout = null;
         },500);
     });
 }
