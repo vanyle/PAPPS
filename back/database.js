@@ -59,6 +59,76 @@ function start_db_client(callback){
 	callback(rethinkdb);
 }
 
+async function processStdinCommand(cmd){
+	cmd = cmd.trim();
+	if(cmd === 'list_users'){
+		let users = await rethinkdb.table('users').run();
+		let sessions = await rethinkdb.table('session').run();
+
+		if(users.length == 0){
+			console.log("No users in db.");
+			return;
+		}
+
+		console.log("Users:")
+		for(let i in users){
+			let isco = false;
+			let toPrint = "	"+users[i].name+" "+users[i].id+" "+users[i].rights.join(',')+" ";
+			for(let j = 0;j < sessions.length;j++){
+				if(sessions[j].session.user_id === users[i].id && sessions[j].session.co){
+					toPrint += GREEN_COLOR_CODE + "CONNECTED" + RESET_COLOR_CODE
+					isco = true;
+					break;
+				}
+			}
+			if(!isco){
+				toPrint += RED_COLOR_CODE + "NOT CONNECTED" + RESET_COLOR_CODE;
+			}
+			console.log(toPrint);
+		}
+	}else if(cmd.startsWith('new_user ')){
+		cmd = cmd.split(' ');
+		let username = cmd[1];
+		let password = cmd[2];
+		let rights = ['make_recipe'];
+		if(cmd.length >= 4){
+			rights = cmd[3].split(',');
+		}
+		let email = "a.a@a.com";
+
+		console.log("Creating user: "+username+" with password: "+password+" and rights: "+rights.join('|'));
+		let result = await rw.create_user(username,rights,password,email,rethinkdb);
+		if(result.error){
+			console.log(result.error);
+		}else{
+			console.log("Created user with id: "+result.result.generated_keys[0]);
+		}
+	}else{
+		console.log("Command: "+cmd+" not recognized. See README.md for the list of commands");
+	}
+}
+
+function setupStdin(){
+	process.stdin.resume();
+	process.stdin.setEncoding('utf8');
+
+	let databuffer = "";
+	process.stdin.on('data', function(data) {
+		data = data + "";
+
+		// add data to buffer until a line break is found.
+		for(let i = 0;i < data.length;i++){
+			if(data[i] == '\n'){
+				// process the logs and flush the buffer
+				processStdinCommand(databuffer);
+				databuffer = "";
+			}else{
+				databuffer += data[i];
+			}
+		}
+	});
+}
+
 module.exports.setup = (c,callback) => {
 	config = c;
 	config.db_program = config.db_program || "rethinkdb"; // set default value
@@ -150,6 +220,8 @@ module.exports.setup = (c,callback) => {
 		process.on('SIGTERM',manage_shutdown);
 
 		console.log(GREEN_COLOR_CODE+"Database started."+RESET_COLOR_CODE);
+
+		setupStdin();
 	});
 
 };

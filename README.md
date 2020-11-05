@@ -66,6 +66,42 @@ Téléchargez RethinkDB depuis cette URL: https://download.rethinkdb.com/reposit
 
 Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans votre PATH ou dans le même dossier que `database.js` i.e. `/back`
 
+## Mettre des trucs dans la base de donnée
+
+Par défaut, la base de donnée est vide, donc, si vous lancez le site avec `node server.js`, et que vous allez à l'url du site, vous ne verrez aucune recette et vous ne pourrez pas vous connecter. Pour générer des données "de test", mettez dans `config.json` l'option `put_fake_data` à `true`. Cela à aussi pour effet de supprimer tout le contenu déjà présent, donc faites attention à n'utiliser cette option que dans un contexte de test.
+
+Lorsque l'application est lancée, vous aurez accès à une console dans laquelle vous pourrez entrer des commandes. Voilà les commandes disponibles:
+
+`new_user <username> <password> [rights]`
+
+Crée un nouvel utilisateur appelé `username` avec comme mot de passe `password`. Par défaut, cette utilisateur aura uniquement le droit `make_recipe`. Sinon, mettez la liste des droits que vous voulez, séparée par des virgules.
+
+Exemple: `new_user tom azerty make_recipe,delete_recipe,delete_comment`
+
+-------
+
+`list_users`
+
+Affiche la liste des utilisateurs du site, leur id, et si ils sont connectés.
+
+-------
+
+`log <on/off>` (Pas implémenté)
+
+Active ou désactive les logs. Permet d'afficher ce que les utilisateurs font dans la console.
+
+-------
+
+Pour l'autre modification plus poussez comme supprimer un utilisateur, il faut utiliser le site d'administration en supprimant de la config l'option `--no-http-admin`. Dans l'onglet `DataExplorer`, vous pouvez entrer des requêtes pour lire et modifier la base de donnée.
+
+Exemple de requête: 
+
+```js
+r.table('users').delete({id:"<id_de_utilisateur_a_supprimer>"});
+```
+
+Plus d'information sur les requêtes possibles ici: https://rethinkdb.com/api/javascript/insert
+
 ## Faire marcher le HTTPS
 
 Par défaut, le site utilise HTTP. Si vous le lancez, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
