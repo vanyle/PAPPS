@@ -23,14 +23,14 @@ function getCurrentSteps(){
 }
 
 async function loadNew() {
-    title_input_dom.addEventListener('keyup', function(){
+    title_input_dom.onkeyup = function(){
         document.querySelector('.recipe-title').innerHTML = text_formatter(this.value);
-    });
+    };
 
-    description_input_dom.addEventListener('keyup', function(){
+    description_input_dom.onkeyup = function(){
         document.querySelector('.recipe-description').innerHTML = text_formatter(this.value);
-    });
-    image_input_dom.addEventListener('change',function(){
+    };
+    image_input_dom.onchange = function(){
         // convert file to data url and display it.
         let file = image_input_dom.files[0];
         let reader  = new FileReader();
@@ -43,7 +43,7 @@ async function loadNew() {
             document.querySelector('.recipe-image').src = currentDataURL;
         }
         reader.readAsDataURL(file);
-    });
+    };
 
     let addTag = () => {
         let tag = tag_selector_dom.value;
@@ -71,7 +71,7 @@ async function loadNew() {
             toast('Tag invalide.');
         }
     };
-    tag_button_dom.addEventListener('click',addTag);
+    tag_button_dom.onclick = addTag;
 
     let addIngredient = () => {
         let current_ingredients = getCurrentIngredients();
@@ -98,13 +98,13 @@ async function loadNew() {
             button.parentElement.parentElement.removeChild(button.parentElement);
         }
     };
-    ingredient_button_dom.addEventListener('click',addIngredient);
-    ingredient_input_dom.addEventListener('keydown',(e) => {
+    ingredient_button_dom.onclick = addIngredient;
+    ingredient_input_dom.onkeydown = (e) => {
         if(e.key === "Enter"){
             e.preventDefault();
             addIngredient();
         }
-    });
+    };
 
     let addStep = () => {
         let current_steps = getCurrentSteps();
@@ -131,10 +131,10 @@ async function loadNew() {
             button.parentElement.parentElement.removeChild(button.parentElement);
         }
     };
-    step_button_dom.addEventListener('click',addStep);
+    step_button_dom.onclick = addStep;
 
 
-    publish_button_dom.addEventListener('click', async () => {
+    publish_button_dom.onclick = async () => {
         // Let's publish this bad boy !
         let recipeObject = {
             title: title_input_dom.value,
@@ -153,7 +153,7 @@ async function loadNew() {
         //console.log(result);
            location.href = '/recipe.html?id=' + result.id;
         }
-    });
+    };
 }
 
 set_load_section_event('new',loadNew);

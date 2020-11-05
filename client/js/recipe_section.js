@@ -58,7 +58,7 @@ async function loadRecipeList() {
     // If the user has not pressed a key for 500ms, start the search.
 
     let searchTimeout = null;
-    recipe_search_dom.addEventListener('keydown',async (e) => {
+    recipe_search_dom.onkeydown = async (e) => {
         if(searchTimeout !== null){
             clearTimeout(searchTimeout);
         }else{
@@ -73,7 +73,7 @@ async function loadRecipeList() {
             showRecipes(recipesList);
             searchTimeout = null;
         },500);
-    });
+    };
 }
 
 

@@ -144,14 +144,6 @@ module.exports.create_image = async (data,r) => {
 			resolve({error:"file is not a valid URI-base64 encoded image"});
 		}
 
-		console.log(data);
-		console.log(headerLength);
-
-		console.log("Snippets from base64 url:");
-		console.log("a:"+data.substring(0,headerLength + 10)+" ()");
-		console.log("b:"+data.substring(0,headerLength)+" ()");
-		console.log("c:"+data.substring(headerLength,headerLength+10)+" ()");
-
 		let buffer = Buffer.from(data.substring(headerLength,data.length), 'base64');
 
 		// convert base64 to raw bytes.
