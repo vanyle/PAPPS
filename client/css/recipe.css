@@ -28,16 +28,18 @@ img[src]::after {
 }
 
 .recipe-title{
-  font-size: 4vw;
+  font-size: 30px;
   position: relative;
   bottom: 8vw;
   left: 2vw;
   font-weight: bold;
-  color: white;
+  background-color: #be433c;
+  color: #FFF;
   padding: 5px 10px;
   width: max-content;
   /* needs a text shadow to be visible on all background colors */
-  text-shadow: #000 1px 1px 5px;
+  box-shadow: #000 1px 1px 2px;
+  border-radius: 5px;
 }
 .recipe-title *{
   font-size: 4vw;
@@ -52,16 +54,17 @@ img[src]::after {
   /*text-align: justify;*/ /*Might produce weird spacing between word with 2 line descriptions*/
   text-indent: 40px;
 }
-.recipe-description *{
-  text-indent:0px;
-}
+
+
 .empty-star-container {
   position: absolute;
 }
+
 .full-star-container {
   position: relative;
   width: max-content;
 }
+
 .recipe-steps-list, .recipe-ingredients-list {
   margin: 20px;
 }
@@ -93,7 +96,7 @@ img[src]::after {
 }
 
 .tag {
-  background-color: #EEE;
+  background-color: #fadbbc;
   padding: 7px;
   margin: 3px;
   display: inline-block;
@@ -142,8 +145,8 @@ form{
 }
 
 .comment {
-  /*background-color: #EEE;*/
-  /*border-bottom:1px solid #000;*/
+  background-color: #fadbbc;
+  border-radius: 10px;
   padding: 10px;
   margin: 10px;
 }
@@ -156,7 +159,7 @@ form{
 }
 
 .comment-username {
-  font-weight: bold;
+  font-family: AllerDisplay;
 }
 
 .comment-content {

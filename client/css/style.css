@@ -1,36 +1,49 @@
+@font-face {
+	font-family: AllerRegular;
+	src: url(../fonts/Aller_Rg.ttf);
+}
+
+@font-face {
+	font-family: AllerDisplay;
+	src: url(../fonts/AllerDisplay.ttf);
+}
+
 body,html{
 	overflow-x: hidden;
 	height:100%;
+	font-family: AllerRegular;
 }
 *{
 	margin:0;
 	padding:0;
 	font-weight:400;
 	box-sizing:border-box;
-	font-size: max(15px,1.5vw); /* Text gets smaller on smaller screens up to a point */
+	font-size: 16px; /* Text gets smaller on smaller screens up to a point */
 	transition:500ms;
-	font-family:sans-serif;
 }
 h1{
-	font-size:3vw;
+	font-size:26px;
+	font-family: AllerDisplay;
 	text-align:center;
 	padding-left:10px;
 	margin:0px;
 	overflow:visible;
+	text-transform: uppercase;
 }
 h2{
-	font-size:2.5vw;
-	color:#333;
+	font-family: AllerDisplay;
+	font-size:22px;
 }
 h3{
+	font-family: AllerDisplay;
 	text-align: center;
-	color:#333;
+	font-size: 20px;
 }
 p{
 	margin:10px;
 }
 body{
-	background-color:rgb(255, 243, 181);
+	background-color: #fdf5ea;
 }
 header{
 	position:relative;
@@ -39,10 +52,10 @@ header{
 	align-items:center;
 	/*box-shadow: 0px 1px 2px 0px #333;*/
 	flex-direction: column;
-	border-bottom:3px solid rgb(255, 210, 77);
+	border-bottom: 3px solid #f5ba44;
 }
 header *{
-	color: #000;
+	color: #FFF;
 	font-size: 20px;
 }
 nav{
@@ -68,25 +81,33 @@ nav > *{
 	margin-right:1vw;
 
 	/* General appearance */
-	font-size: max(1.5vw,12px);
-	color: #000;
+	font-size: 18px;
+	font-family: AllerDisplay;
+	color: #FFF;
 	border-radius: 10px 10px 0 0; /* upper side is rounded */
 	text-transform: uppercase;
-	background-color: rgb(255, 210, 77);
+	background-color: #f5ba44;
 }
+
+nav > a {
+	color: #FFF;
+}
+
 nav > a:hover{
 	cursor: pointer;
-	color: #000;
-	background-color: rgb(255, 157, 0);
+	color: #FFF;
+	background-color: #fb9644;
 }
+
 [data-show]{
 	cursor:pointer;
 }
+
 header > a{
 	position:absolute;
 	right:10px;
 	top:10px;
-	background-color: rgb(255, 157, 0);
+	background-color: #fb9644;
 	border-radius:10px;
 	padding: 10px;
 	text-transform: uppercase;
@@ -125,11 +146,12 @@ button{
 	text-transform: uppercase;
 	transition: transform 80ms ease-in;
 	cursor:pointer;
+	font-family: AllerDisplay;
 }
 button.small{ /*Recommended for font awesome buttons */
 	padding: 10px;
-	border: 3px solid #FF8B4B;
-	background-color: #FF4B2B;
+	border: 3px solid #fb9644;
+	background-color: #be433c;
 	margin:0 10px;
 }
 button.publish{
@@ -137,8 +159,8 @@ button.publish{
 	background-color: #4BFF2B;
 }
 button.connect{
-	border: 1px solid #FF4B2B;
-	background-color: #FF4B2B;
+	border: 1px solid #be433c;
+	background-color: #be433c;
 	color: #FFFFFF;
 }
 input[type=text],input[type=password]{
@@ -168,7 +190,7 @@ button:active{
 .error{
 	text-align:center;
 	padding:5px;
-	color:red;
+	color: #be433c;
 }
 form{
 	display:flex;
@@ -208,7 +230,7 @@ b{
 	display:inline-block;
 }
 .comic{
-	font-family:"Comic Sans MS";
+	font-family:"Comic Sans MS", "Comic Sans", TSCu_Comic, cursive;
 }
 .rainbow{
 	background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
@@ -222,7 +244,7 @@ b{
 	animation:zoommove 1s linear infinite;
 	display:inline-block;
 }
-@keyframes rainbow { 
+@keyframes rainbow {
     0%{background-position:0% 50%}
     50%{background-position:100% 25%}
     100%{background-position:0% 50%}
@@ -282,4 +304,8 @@ optgroup{
 option{
 	color:#000;
 	text-transform: none;
+}
+
+.fa-star {
+	color: #f5ba44;
 }

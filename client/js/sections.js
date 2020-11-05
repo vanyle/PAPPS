@@ -173,7 +173,7 @@ function text_formatter(input_text){
 		for(let j in parseInfo){
 			if(input_text[i] === parseInfo[j].delimiter && input_text[i-1] !== '\\'){
 
-				output_text += parseInfo[j].b ? parseInfo[j].end : parseInfo[j].start;					
+				output_text += parseInfo[j].b ? parseInfo[j].end : parseInfo[j].start;
 				parseInfo[j].b = !parseInfo[j].b;
 				match = true;
 				break;
@@ -196,7 +196,7 @@ function text_formatter(input_text){
 function formatTime(date){
 	// formats time based on french day notation:
 	// 30 septembre 2011.
-	return new Intl.DateTimeFormat('fr', { month: 'long',day:'2-digit',year:'numeric' }).format(date);
+	return new Intl.DateTimeFormat('fr', {weekday: "long", month: 'long',day:'2-digit',year:'numeric' }).format(date);
 }
 
 // ------------------------------------------------------
@@ -205,7 +205,7 @@ function formatTime(date){
 let section_load_events = {};
 
 function set_load_section_event(section_name,function_name){
-	section_load_events[section_name] = function_name;	
+	section_load_events[section_name] = function_name;
 }
 
 // Shows a specific section of the website.
@@ -253,7 +253,7 @@ async function display_nav(){
 					loadCountRequired ++;
 					script.src = 'js/' + el.getAttribute('data-file');
 					document.head.appendChild(script); // not needed for execution but it's nice to now what scripts have been loaded.
-					
+
 				}
 				el.style.display = '';
 			}else{
@@ -269,7 +269,7 @@ async function display_nav(){
 }
 
 addEventListener('load',async () => {
-	
+
 	await build_header(); // generate the navigation buttons
 
 	// Add events for the navigation buttons
