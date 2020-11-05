@@ -61,7 +61,14 @@ function start_db_client(callback){
 
 async function processStdinCommand(cmd){
 	cmd = cmd.trim();
-	if(cmd === 'list_users'){
+	if(cmd === 'erase_db_and_start_clean'){
+		await rw.deleteTable("images",r); // ignore errors if the table does not exist, this is a setup function
+		await rw.createTable("images",r);
+		await rw.deleteTable("users",r); // clear user table.
+		await rw.createTable("users",r);
+		await rw.deleteTable("recipes",r);
+		await rw.createTable("recipes",r);
+	}else if(cmd === 'list_users'){
 		let users = await rethinkdb.table('users').run();
 		let sessions = await rethinkdb.table('session').run();
 

@@ -70,7 +70,13 @@ Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans 
 
 Par défaut, la base de donnée est vide, donc, si vous lancez le site avec `node server.js`, et que vous allez à l'url du site, vous ne verrez aucune recette et vous ne pourrez pas vous connecter. Pour générer des données "de test", mettez dans `config.json` l'option `put_fake_data` à `true`. Cela à aussi pour effet de supprimer tout le contenu déjà présent, donc faites attention à n'utiliser cette option que dans un contexte de test.
 
-Lorsque l'application est lancée, vous aurez accès à une console dans laquelle vous pourrez entrer des commandes. Voilà les commandes disponibles:
+Lorsque l'application est lancée, vous aurez accès à une console dans laquelle vous pourrez entrer des commandes. Pour tout supprimer de la base de donnée et pouvoir commencer à ajouter des utilisateurs, faites:
+
+`erase_db_and_start_clean`
+
+-------
+
+Voilà les autres commandes disponibles:
 
 `new_user <username> <password> [rights]`
 
