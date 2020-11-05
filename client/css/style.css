@@ -260,7 +260,26 @@ b{
 /* Related to the create recipe section */
 .recipe-creator{
 	display:flex;
+	flex-wrap: wrap;
+	align-items:center;
 }
 .recipe-preview{
 	padding:1vw;
+	width:min(500px,100%);
+}
+.recipe-creator>form{
+	width:min(400px,100%);
+}
+select{
+	background-color:transparent;
+	outline:none;
+}
+optgroup{
+	color:#555;
+	font-weight:lighter;
+	text-transform: uppercase;
+}
+option{
+	color:#000;
+	text-transform: none;
 }

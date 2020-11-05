@@ -36,27 +36,46 @@
 				<form>
 					<input maxlength="100" id="title_input_dom" type="text" placeholder="Titre"/>
 					<textarea id="description_input_dom" placeholder="Description"></textarea>
-					<input type="file" accept="image/png, image/jpeg" placeholder="Une image de la recette"/>
-					
-					<select>
-						<option>dessert</option>
-						<option>plat principal</option>
-						<option>petit déjeuné</option>
-						<option>vegan</option>
-						<option>sucré</option>
-						<option>rapide</option>
-						<option>exotique</option>
-						<option>facile</option>
-						<option>classe</option>
-					</select>
-					<button>Ajouter un tag</button>
 
-					<input type="text" placeholder="Ingrédient"/>
-					<button>Ajouter un ingredient</button>
+					<div>Ajouter une image: <input type="file" id="image_input_dom" accept="image/png, image/jpeg"/></div>
+					<br/>
+					<div>
+						<select id="tag_selector_dom">
+							<optgroup label="repas / type de plats">
+								<option>petit déjeuné</option>
+								<option>soupe</option>
+								<option>brunch</option>
+								<option>entrée</option>
+								<option>plat principal</option>
+								<option>dessert</option>
+							</optgroup>
+							<optgroup label="régimes">
+								<option>vegan</option>
+								<option>sans gluten</option>
+							</optgroup>
+							<optgroup label="goût">
+								<option>sucré</option>
+								<option>épicé</option>
+							</optgroup>
+							<optgroup label="général">
+								<option>rapide</option>
+								<option>exotique</option>
+								<option>facile</option>
+								<option>classe</option>
+							</optgroup>
+						</select>
+						<button id="tag_button_dom" class='small'>Ajouter un tag</button>
+					</div>
 
-					<textarea placeholder="Une étape"></textarea>
-					<button>Ajouter une étape à la recette</button>
+					<div>
+						<input id="ingredient_input_dom" type="text" placeholder="Ingrédient"/>
+						<button id="ingredient_button_dom" class='small'>Ajouter un ingredient</button>
+					</div>
 
+					<div>
+					<textarea id="step_input_dom" placeholder="Une étape"></textarea>
+					<button id="step_button_dom" class='small'>Ajouter une étape à la recette</button>
+					</div>
 				</form>
 				<div class='recipe-preview'>
 					<div class="recipe-image-container">
@@ -89,7 +108,7 @@
 					</div>
 				</div>
 			</div>
-			<div class='force_center'><button class='publish'>Publier ma recette !</button></div>
+			<div class='force_center'><button id="publish_button_dom" class='publish'>Publier ma recette !</button></div>
 		</div>
 
 		<div class='shop block'>

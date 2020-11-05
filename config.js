@@ -18,5 +18,6 @@ module.exports = {
 
 	"oauth_secret":"./secret/oauth.json",
 
-	"put_fake_data":false
+	"put_fake_data":false,
+	"create_users":true
 }

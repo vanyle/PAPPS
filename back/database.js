@@ -258,14 +258,16 @@ module.exports.handle_post_query = async (req,res) => {
 		send_error(res,"database not ready. Please wait a bit.");
 		return;
 	}
+
+	let body = req.body + "";
+	if(body.length >= 2000*1000){ // basic ddos protection, this check is not really necessary as express already does it.
+		send_error(res,'body is too big. (size = '+body.length+')');
+		return;
+	}
+
 	if(req.query.type === "make_recipe"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");
-			return;
-		}
-		let body = req.body + "";
-		if(body.length >= 100000){ // basic ddos protection.
-			send_error(res,'body is too big.');
 			return;
 		}
 		try{
@@ -275,13 +277,17 @@ module.exports.handle_post_query = async (req,res) => {
 			return;
 		}
 
-		let image_result = rw.create_image(req.body.image,rethinkdb)
-		if(image_result.error == null) image_result = image_result.result.id;
+		let image_result = await rw.create_image(body.image,rethinkdb)
+		if(image_result.error == null){
+			image_result = image_result.result.id;
+			// create_recipe should check the types of everything.
+			let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,image_result,rethinkdb);
+			send_response(res,result);
+		}else{
+			send_response(res,image_result);
+		}
 
-		// create_recipe should check the types of everything.
-		let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,image_result,rethinkdb);
 
-		send_response(res,result);
 	}else if(req.query.type === "delete_recipe"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");
@@ -296,11 +302,6 @@ module.exports.handle_post_query = async (req,res) => {
 	}else if(req.query.type === "make_comment"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");
-			return;
-		}
-		let body = req.body + "";
-		if(body.length >= 100000){ // basic ddos protection.
-			send_error(res,'body is too big.');
 			return;
 		}
 		let id = req.query.id;

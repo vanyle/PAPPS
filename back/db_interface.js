@@ -121,8 +121,12 @@ module.exports.create_user = (name,rights,clear_password,email,r) => {
 	return module.exports.insert(user,"users",r);
 }
 
-module.exports.create_image = async (data,rethinkdb) => {
+module.exports.create_image = async (data,r) => {
 	return new Promise(async (resolve) => {
+		if(typeof data !== "string"){
+			resolve({error:"no image provided!"});
+			return;
+		}
 		if(data.length >= 1024 * 1024){ // 1 Mo
 			resolve({error:"image is too big"});
 			return;
@@ -131,7 +135,7 @@ module.exports.create_image = async (data,rethinkdb) => {
 		let headerLength = -1;
 		for(let i = 0;i < allowedMimeTypes.length;i++){
 			if(data.startsWith('data:image/'+allowedMimeTypes[i]+';base64,')){
-				headerLength = 'data:image/'+allowedMimeTypes[i]+';base64,'.length;
+				headerLength = ('data:image/'+allowedMimeTypes[i]+';base64,').length;
 				break;
 			}
 		}
@@ -139,6 +143,14 @@ module.exports.create_image = async (data,rethinkdb) => {
 		if(headerLength == -1){
 			resolve({error:"file is not a valid URI-base64 encoded image"});
 		}
+
+		console.log(data);
+		console.log(headerLength);
+
+		console.log("Snippets from base64 url:");
+		console.log("a:"+data.substring(0,headerLength + 10)+" ()");
+		console.log("b:"+data.substring(0,headerLength)+" ()");
+		console.log("c:"+data.substring(headerLength,headerLength+10)+" ()");
 
 		let buffer = Buffer.from(data.substring(headerLength,data.length), 'base64');
 
@@ -183,10 +195,10 @@ module.exports.create_recipe = async (user_id,title,description,tags,ingredients
 				return;
 			}
 
-			let ingredientValid = (ingredients instanceof Array) && ingredients.length <= 100;
+			let ingredientValid = (ingredients instanceof Array) && ingredients.length <= 100 && ingredients.length >= 1;
 			if(ingredientValid){
 				for(let i = 0;i < ingredients.length;i++){
-					ingredientValid = ingredientValid && typeof tags[i] === 'string' && ingredients[i].length <= 200 && is_using_valid_ingredient_charset(ingredients[i]);
+					ingredientValid = ingredientValid && typeof ingredients[i] === 'string' && ingredients[i].length <= 200 && is_using_valid_ingredient_charset(ingredients[i]);
 					if(!ingredientValid) break;
 				}
 			}
@@ -195,7 +207,7 @@ module.exports.create_recipe = async (user_id,title,description,tags,ingredients
 				return;
 			}
 
-			let stepsValid = (steps instanceof Array) && steps.length <= 100;
+			let stepsValid = (steps instanceof Array) && steps.length <= 100 && steps.length >= 1;
 			if(stepsValid){
 				for(let i = 0;i < steps.length;i++){
 					stepsValid = stepsValid && typeof steps[i] === 'string' && steps[i].length <= 1000;
