@@ -129,7 +129,7 @@ pm2 start server.js
 
 ### `Directory '../db/' is already in use, perhaps another instance of rethinkdb is using it.`
 
-La base de donnée s'est arrêtée sans le site. C'est parfois le cas si le processus du site à été arrêté de manière trop violente. Par exemple avec un signal `KILL` ou lieu de `TERMINATE` ou `INTERRUPT`. (Il est recommandé d'utiliser le signal `INT` pour l'arrêt même si `TERMINATE` convient). Essayez de ne jamais utiliser `KILL` pour terminer le process ! Cela pourrait endommager la base de donnée !
+La base de donnée s'est arrêtée sans le site. C'est parfois le cas si le processus du site à été arrêté de manière trop violente. Par exemple avec un signal `KILL` ou lieu de `TERMINATE` ou `INTERRUPT`. (Il est recommandé d'utiliser le signal `INT` pour l'arrêt même si `TERMINATE` convient). Essayez de ne jamais utiliser `KILL` pour terminer le processus ! Cela pourrait endommager la base de donnée !
 
 Il faut retrouver le processus de la base de donnée et l'arrêter manuellement.
 
@@ -152,9 +152,17 @@ kill -2 <numéro du process à tuer>
 # si cette commande ne marche pas, remplaçez le -2 par un -9
 ```
 
+### `Port 80 / 443 already in use`
 
+Un autre processus utilise les ports dont notre application a besoin. Dans 90% des cas, c'est cette saloperie de `nginx`. Pour s'en débarrasser, il faut arrêter le processus `nginx`. Pour ça utiliser la commande kill avec un `-9` pour envoyer un signal `KILL`. Aussi, faites un `sudo apt-get remove nginx` et aussi supprimez tout les fichiers de config de nginx, le contenu de `var/www` et tout. Il faut tout détruire.
 
-## Faire marcher le HTTPS
+En général, utilisez la commande ci-dessous pour savoir quels applications utilisent des ports et quel est le processus associé à arrêter:
+
+```bash
+netstat -ltnp | grep -w ':80' # Remplacez 80 par le numéro du port qui pose problème 
+```
+
+## Faire marcher le HTTPS. 
 
 Par défaut, le site utilise HTTP. Si vous le lancez, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
 
