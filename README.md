@@ -108,6 +108,54 @@ r.table('users').delete({id:"<id_de_utilisateur_a_supprimer>"});
 
 Plus d'information sur les requêtes possibles ici: https://rethinkdb.com/api/javascript/insert
 
+## Mettre à jour le site
+
+Faites la commande ci-dessous dans le dossier ou le serveur tourne pour mettre à jour le code du site. Lancer la commande après avoir arrêter le serveur.
+
+```bash
+git pull
+```
+
+## Déployer proprement le site
+
+Disons que vous avez suivis les instructions d'installations et que `node server.js` marche, que vous avez initialiser la base de donnée avec `erase_db_and_start_clean` et que vous avez ajouter les utilisateurs de votre choix. Maintenant, il faut faire tourner le site de manière permanente. Vérifiez bien que `-no-http-admin` se trouve dans le fichier `config.js`. Faites `Ctrl-Z` pour détacher le processus puis:
+
+```bash
+bg # met le processus en arrière-plan
+disown # détache le processus du terminal courant
+```
+
+Après ces commandes, vous pourrez fermer votre terminal et le serveur continuera à tourner tout seul
+
+## Problèmes courants
+
+### `Directory '../db/' is already in use, perhaps another instance of rethinkdb is using it.`
+
+La base de donnée s'est arrêtée sans le site. C'est parfois le cas si le processus du site à été arrêté de manière trop violente. Par exemple avec un signal `KILL` ou lieu de `TERMINATE` ou `INTERRUPT`. (Il est recommandé d'utiliser le signal `INT` pour l'arrêt même si `TERMINATE` convient). Essayez de ne jamais utiliser `KILL` pour terminer le process ! Cela pourrait endommager la base de donnée !
+
+Il faut retrouver le processus de la base de donnée et l'arrêter manuellement.
+
+```bash
+ps aux | grep rethinkdb # Affiche la liste des processus utilisants la base de données
+```
+
+Plusieurs lignes font être affichés de cette forme:
+
+```
+root      1600  0.0  5.7 267136 117676 ?       Sl   00:01   0:25 rethinkdb -d ../db/ ........
+root      1601  0.0  1.0  86372 21776 ?        S    00:01   0:00 rethinkdb -d ../db/ ........
+```
+
+Ensuite, pour chaque ligne contenant `rethinkdb`, faites
+
+```bash
+kill -2 <numéro du process à tuer>
+# ici, par exemple, on ferait: kill -2 1600 et kill -2 1601
+# si cette commande ne marche pas, remplaçez le -2 par un -9
+```
+
+
+
 ## Faire marcher le HTTPS
 
 Par défaut, le site utilise HTTP. Si vous le lancez, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"

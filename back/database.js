@@ -158,8 +158,8 @@ module.exports.setup = (c,callback) => {
 		if(err){
 			console.log(RED_COLOR_CODE+"Unable to start database:"+RESET_COLOR_CODE);
 			console.log(err.message);
-			console.log("Is it installed ? You can install mongodb using the tutorial provided in README.md");
-			console.log("If the database is installed, \"mongod --version\" should print the version installed.")
+			console.log("Is it installed ? You can install rethinkdb using the tutorial provided in README.md");
+			console.log("If the database is installed, \"rethinkdb --version\" should print the version installed.")
 			process.exit(1);
 		}
 
