@@ -68,9 +68,9 @@ Décompressez le zip téléchargé et mettez l'exécutable `rethinkdb.exe` dans 
 
 ## Mettre des trucs dans la base de donnée
 
-Par défaut, la base de donnée est vide, donc, si vous lancez le site avec `node server.js`, et que vous allez à l'url du site, vous ne verrez aucune recette et vous ne pourrez pas vous connecter. Pour générer des données "de test", mettez dans `config.json` l'option `put_fake_data` à `true`. Cela à aussi pour effet de supprimer tout le contenu déjà présent, donc faites attention à n'utiliser cette option que dans un contexte de test.
+Par défaut, la base de donnée est vide, donc, si vous lancez le site avec `node server.js`, et que vous allez à l'url du site, vous ne verrez aucune recette et vous ne pourrez pas vous connecter. Pour générer des données "de test", mettez dans `config.js` l'option `put_fake_data` à `true`. Cela à aussi pour effet de supprimer tout le contenu déjà présent, donc faites attention à n'utiliser cette option que dans un contexte de test.
 
-Lorsque l'application est lancée, vous aurez accès à une console dans laquelle vous pourrez entrer des commandes. Pour tout supprimer de la base de donnée et pouvoir commencer à ajouter des utilisateurs, faites:
+Lorsque l'application est lancée, vous aurez accès à une console dans laquelle vous pourrez entrer des commandes. Pour tout supprimer de la base de données et pouvoir commencer à ajouter des utilisateurs, faites:
 
 `erase_db_and_start_clean`
 
@@ -98,7 +98,7 @@ Active ou désactive les logs. Permet d'afficher ce que les utilisateurs font da
 
 -------
 
-Pour l'autre modification plus poussez comme supprimer un utilisateur, il faut utiliser le site d'administration en supprimant de la config l'option `--no-http-admin`. Dans l'onglet `DataExplorer`, vous pouvez entrer des requêtes pour lire et modifier la base de donnée.
+Pour d'autres modifications plus poussées comme supprimer un utilisateur, il faut utiliser le site d'administration en supprimant de la config l'option `--no-http-admin`. Dans l'onglet `DataExplorer`, vous pouvez entrer des requêtes pour lire et modifier la base de données.
 
 Exemple de requête: 
 
@@ -129,7 +129,7 @@ pm2 start server.js
 
 ### `Directory '../db/' is already in use, perhaps another instance of rethinkdb is using it.`
 
-La base de donnée s'est arrêtée sans le site. C'est parfois le cas si le processus du site à été arrêté de manière trop violente. Par exemple avec un signal `KILL` ou lieu de `TERMINATE` ou `INTERRUPT`. (Il est recommandé d'utiliser le signal `INT` pour l'arrêt même si `TERMINATE` convient). Essayez de ne jamais utiliser `KILL` pour terminer le processus ! Cela pourrait endommager la base de donnée !
+La base de données s'est arrêtée sans le site. C'est parfois le cas si le processus du site à été arrêté de manière trop violente. Par exemple avec un signal `KILL` ou lieu de `TERMINATE` ou `INTERRUPT`. (Il est recommandé d'utiliser le signal `INT` pour l'arrêt même si `TERMINATE` convient). Essayez de ne jamais utiliser `KILL` pour terminer le processus ! Cela pourrait endommager la base de donnée !
 
 Il faut retrouver le processus de la base de donnée et l'arrêter manuellement.
 
@@ -149,7 +149,7 @@ Ensuite, pour chaque ligne contenant `rethinkdb`, faites
 ```bash
 kill -2 <numéro du process à tuer>
 # ici, par exemple, on ferait: kill -2 1600 et kill -2 1601
-# si cette commande ne marche pas, remplaçez le -2 par un -9
+# si cette commande ne marche pas, remplaçez le -2 par un -15 ou un -9
 ```
 
 ### `Port 80 / 443 already in use`
@@ -162,7 +162,7 @@ En général, utilisez la commande ci-dessous pour savoir quels applications uti
 netstat -ltnp | grep -w ':80' # Remplacez 80 par le numéro du port qui pose problème 
 ```
 
-## Faire marcher le HTTPS. 
+### Faire marcher le HTTPS
 
 Par défaut, le site utilise HTTP. Si vous le lancez, vous verrez aussi une erreur comme quoi le HTTPS ne marche pas du type: "Unable to start HTTPS Server. Did you put the HTTPS secrets inside ./secret/ ?"
 
