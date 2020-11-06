@@ -10,7 +10,7 @@ RGB: 219, 49, 52
 
 RGB: 255, 244, 233
 
-<span style='color:rgb(255, 244, 233)'>Couleur des encadrés (rosé foncé)</span>
+<span style='color:rgb(255, 219, 185)'>Couleur des encadrés (rosé foncé)</span>
 
 RGB: 255, 219, 185
 
