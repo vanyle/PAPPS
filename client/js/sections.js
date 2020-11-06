@@ -110,6 +110,14 @@ async function delete_comment(recipeId,commentId){
 	}
 	return result;
 }
+async function delete_recipe(recipeId){
+	let result = JSON.parse(await post_website("/q?type=delete_recipe&id="+recipeId,null));
+	if(result.error){
+		console.error("Unable to delete recipe: ",result.error);
+		return false;
+	}
+	return result;
+}
 
 // -----------------------------------------------------
 // This function displays messages in an alert style way but less aggresivly.

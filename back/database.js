@@ -12,7 +12,7 @@ let db_process = null;
 let db_client = null;
 let client_started = false;
 
-let json_logs = false; // mongod uses JSON logs with version >= 4.4
+let do_logs = false;
 
 const DB_NAME = "PAPS";
 
@@ -34,6 +34,15 @@ function process_errors_from_client(msg){
 	//console.log(RED_COLOR_CODE+"Unable to connect to database. Something weird is going on. Read the database logs for more informations."+RESET_COLOR_CODE);
 	console.log(msg);
 	//process.kill(process.pid, "SIGINT"); // clean shutdown of the db
+}
+function get_pretty_time(){
+	return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+}
+function log_message(msg){
+	if(do_logs){
+		console.log('['+get_pretty_time() + '] ' + msg);
+		// add option to pipe this to file ?
+	}
 }
 
 function start_db_client(callback){
@@ -109,6 +118,24 @@ async function processStdinCommand(cmd){
 			console.log(result.error);
 		}else{
 			console.log("Created user with id: "+result.result.generated_keys[0]);
+		}
+	}else if(cmd.startsWith('logs')){
+		cmd = cmd.split(' ',2);
+		if(cmd.length <= 1){
+			do_logs = !do_logs; // toggle
+		}else{
+			let action = cmd[1].toLowerCase();
+			if(action === 'yes' || action === 'y' || action === 'true' || action === 'on'){
+				do_logs = true;
+			}else{
+				do_logs = false;
+			}
+		}
+
+		if(do_logs){
+			console.log("Logs "+GREEN_COLOR_CODE+"enabled"+RESET_COLOR_CODE);
+		}else{
+			console.log("Logs "+RED_COLOR_CODE+"disabled"+RESET_COLOR_CODE);
 		}
 	}else{
 		console.log("Command: "+cmd+" not recognized. See README.md for the list of commands");
@@ -253,6 +280,7 @@ module.exports.handle_query = async (req,res) => {
 		send_error(res,"database not ready. Please wait a bit.");
 		return;
 	}
+	let ip = req.connection.remoteAddress;
 
 	if(req.query.type === "recipes"){
 		let tags = req.query.tags || "";
@@ -304,6 +332,8 @@ module.exports.handle_query = async (req,res) => {
 			// maybe also store user_id and stuff like that
 			req.session.permissions = login_result.rights;
 			req.session.user_id = login_result.id;
+
+			log_message("Login from "+ip+" as "+username+" ("+login_result.id+")");
 
 			res.send({co:'OK'});
 		}else{
@@ -361,6 +391,9 @@ module.exports.handle_post_query = async (req,res) => {
 			image_result = image_result.result.id;
 			// create_recipe should check the types of everything.
 			let result = await rw.create_recipe(req.session.user_id,body.title,body.description,body.tags,body.ingredients,body.steps,image_result,rethinkdb);
+			if(!result.error){
+				log_message(req.session.username+" created recipe "+body.title);
+			}
 			send_response(res,result);
 		}else{
 			send_response(res,image_result);
@@ -377,7 +410,11 @@ module.exports.handle_post_query = async (req,res) => {
 			send_error(res,"id not provided");
 			return;
 		}
-		send_response(res,await rw.delete_recipe(req.session.user_id,id,rethinkdb));
+		let result = await rw.delete_recipe(req.session.user_id,id,rethinkdb);
+		if(!result.error){
+			log_message(req.session.username+" delete recipe "+id);
+		}
+		send_response(res,result);
 	}else if(req.query.type === "make_comment"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");
