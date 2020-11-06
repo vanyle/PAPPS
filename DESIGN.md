@@ -1,12 +1,16 @@
-<span style='color:rgb(255,243,181)'>Background color</span>
+<span style='color:rgb(253,186,18)'>Couleur JAUNE du logo paps</span>
 
-RGB: 255, 243, 181 
+RGB: 253, 186, 18 
 
-<span style='color:rgb(255, 210, 77)'>Unselected button color</span>
+<span style='color:rgb(219, 49, 52)'>Couleur ROUGE du logo paps</span>
 
-RGB: 255, 210, 77
+RGB: 219, 49, 52
 
-<span style='color:rgb(255, 157, 0)'>Selected button color</span>
+<span style='color:rgb(255, 244, 233)'>Couleur du fond du site (Orange clair/rosé)</span>
 
-RGB: 255, 157, 0
+RGB: 255, 244, 233
+
+<span style='color:rgb(255, 244, 233)'>Couleur des encadrés (rosé foncé)</span>
+
+RGB: 255, 219, 185
 
