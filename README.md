@@ -118,14 +118,12 @@ git pull
 
 ## Déployer proprement le site
 
-Disons que vous avez suivis les instructions d'installations et que `node server.js` marche, que vous avez initialiser la base de donnée avec `erase_db_and_start_clean` et que vous avez ajouter les utilisateurs de votre choix. Maintenant, il faut faire tourner le site de manière permanente. Vérifiez bien que `-no-http-admin` se trouve dans le fichier `config.js`. Faites `Ctrl-Z` pour détacher le processus puis:
+https://github.com/Unitech/pm2
 
 ```bash
-bg # met le processus en arrière-plan
-disown # détache le processus du terminal courant
+npm install pm2 -g
+pm2 start server.js
 ```
-
-Après ces commandes, vous pourrez fermer votre terminal et le serveur continuera à tourner tout seul
 
 ## Problèmes courants
 
