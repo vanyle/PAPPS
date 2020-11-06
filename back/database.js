@@ -24,7 +24,11 @@ const RESET_COLOR_CODE = "\u001b[0m";
 function manage_shutdown(){
 	console.log("Shutting down database.");
 	// The server is about to be shutdown, cleanly shutdown the database also to prevent data corruption
-	// Nothing do to :) (the process is a child and gets a clean error code.)
+	// Kill the childrens !!!!
+	db_process.kill('SIGTERM'); // proper shutdown;
+	setTimeout(() => {
+		process.exit(0);
+	},5000);
 }
 
 function process_logs_from_database(data){
@@ -246,7 +250,9 @@ module.exports.setup = (c,callback) => {
 		});
 		db_process.on('close', (code) => {
 			console.log(`Database process exited with code ${code}`);
-			process.exit(0);
+			setTimeout(() => {
+				process.exit(0);
+			},200);
 		});
 
 		process.on('SIGHUP',manage_shutdown); // called when terminal is closed
