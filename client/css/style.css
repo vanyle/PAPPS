@@ -64,33 +64,26 @@ nav{
 	width:80%;
 	position:relative;
 }
-nav > *{
-	padding-top:1.5%;
+nav > * {
 	/* Center text inside the boxes*/
-	display:flex;
 	text-align:center;
-	align-items:center;
 
-	padding-bottom:1.5%;
-	padding-right:10px;
-	padding-left: 10px;
 
-	/* Manage how the boxes are positioned relative to each other */
-	margin-bottom:-1px;
-	margin-left:1vw;
-	margin-right:1vw;
+
 
 	/* General appearance */
 	font-size: 18px;
 	font-family: AllerDisplay;
 	color: #FFF;
-	border-radius: 10px 10px 0 0; /* upper side is rounded */
 	text-transform: uppercase;
 	background-color: #f5ba44;
 }
 
 nav > a {
-	color: #FFF;
+	color: #be433c;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 nav > a:hover{
@@ -103,24 +96,27 @@ nav > a:hover{
 	cursor:pointer;
 }
 
-header > a{
+header > #header-username-link {
 	position:absolute;
-	right:10px;
-	top:10px;
+	right: 10px;
+	top: 39px;
 	background-color: #fb9644;
-	border-radius:10px;
+	border-radius: 10px;
 	padding: 10px;
 	text-transform: uppercase;
 }
+
 #content{ /* Used to change the bg color of everything except the header if needed */
 	/*background-color: rgb(255, 210, 77);*/
 	/*height:100%;*/
 	position:relative;
 }
+
 a{
 	text-decoration: none;
 	color:#333;
 }
+
 strong{
 	font-weight:600;
 }
@@ -135,6 +131,7 @@ a:hover{
 	width:80%;
 	display:none; /*no display by default, all sections are hidden */
 	margin:auto;
+	flex-direction: column;
 }
 button{
 	border-radius: 20px;
@@ -153,6 +150,7 @@ button.small{ /*Recommended for font awesome buttons */
 	border: 3px solid #fb9644;
 	background-color: #be433c;
 	margin:0 10px;
+	color: #FFFFFF;
 }
 button.publish{
 	border: 1px solid #4BFF2B;
@@ -164,11 +162,13 @@ button.connect{
 	color: #FFFFFF;
 }
 input[type=text],input[type=password]{
-	border:none;
+	color: #be433c;
+	border: 2px solid #be433c;
 	outline:none;
-	padding:8px;
-	box-shadow:0 3px 3px 0 rgba(0,0,0,0.1),0 0 0 1px rgba(0,0,0,0.08);
-	margin:10px;
+	border-radius: 100px;
+	padding: 8px 20px;
+	margin:20px;
+	font-family: AllerDisplay;
 }
 button:hover{
 	filter: brightness(120%);
@@ -200,14 +200,14 @@ form{
 }
 textarea{
 	resize:none;
-	width:80%;
-	margin:auto;
-	background-color:transparent;
-	margin-top:10px;
-	outline:none;
 	display:block;
-	padding:10px;
-	margin-bottom:10px;
+	color: #be433c;
+	border: 2px solid #be433c;
+	outline:none;
+	border-radius: 15px;
+	padding: 8px 20px;
+	margin:20px;
+	font-family: Aller;
 }
 /* Text formatting styles */
 pre{
@@ -292,9 +292,15 @@ b{
 .recipe-creator>form{
 	width:min(400px,100%);
 }
-select{
-	background-color:transparent;
+select {
+	background-color: white;
+	color: #be433c;
+	border: 2px solid #be433c;
 	outline:none;
+	border-radius: 100px;
+	padding: 8px 20px;
+	margin:20px;
+	font-family: AllerDisplay;
 }
 optgroup{
 	color:#555;
@@ -308,4 +314,223 @@ option{
 
 .fa-star {
 	color: #f5ba44;
+}
+
+#notification-container {
+	position: fixed;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+	width: 100%;
+}
+
+.message {
+	background-color: #be433cd0;
+	color: #FFF;
+	text-align: center;
+	border-radius: 100px;
+	padding: 15px;
+	margin: 5px;
+
+	align-self: center;
+  position: relative;
+
+	width: min(80%, 600px);
+}
+
+.messageIn {
+  animation-name: animateMessageIn;
+  animation-duration: 500ms;
+  animation-timing-function: ease-out;
+}
+
+.messageOut {
+  animation-name: animateMessageOut;
+  animation-duration: 350ms;
+  animation-timing-function: ease-in;
+}
+
+@keyframes animateMessageIn {
+  from {
+    bottom: -62px;
+    opacity: 0;
+  }
+
+  to {
+    bottom: 10px;
+    opacity: 1;
+  }
+}
+
+@keyframes animateMessageOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.browse {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#recipe_search_container {
+	width: min(calc(100% - 40px), 600px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+#recipe_search_dom {
+	position: relative;
+	margin: 0;
+	width: 100%;
+	padding-right: 50px;
+}
+
+.recipe-search-icon {
+	color: #be433c;
+	position: absolute;
+	right: 15px;
+}
+
+@media screen and (min-width: 600px) {
+	nav > a {
+		padding-top: 15px;
+		padding-bottom:15px;
+		padding-right: 5px;
+		padding-left: 5px;
+
+		/*Make all items same width*/
+		flex: 1;
+
+		/* Manage how the boxes are positioned relative to each other */
+		margin-bottom:-1px;
+		margin-left:1vw;
+		margin-right:1vw;
+		border-radius: 10px 10px 0 0; /* upper side is rounded */
+	}
+
+	#headerMenu {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	header {
+		position: static;
+	}
+
+	#headerMenu {
+		width: 70%;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		z-index: 4;
+		align-self: flex-start;
+		border-right: 3px solid #be433c;
+	}
+
+	#sandwichButtonContainer {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		background-color: #f5ba44;
+	}
+
+	#toggleMenuButtonInsideSandwich {
+		color: #be433c;
+		padding: 10px;
+		margin-left: 10px;
+		margin-top: 10px;
+		cursor: pointer;
+	}
+
+	nav {
+		display: flex;
+		flex-direction: column;
+		align-self: flex-start;
+		height: 100%;
+		flex: 1;
+		width: 100%;
+	}
+
+	body {
+		position: relative;
+		height: 100%;
+	}
+
+	nav > a {
+		flex: 1;
+		vertical-align: middle;
+		color: #be433c;
+	}
+
+	nav > a:before {
+		font-family: "Font Awesome 5 Free";
+   content: "\f2e7";
+	 margin-right: 10px;
+   display: inline-block;
+   vertical-align: middle;
+   font-weight: 900;
+	}
+}
+
+#toggleMenuButton {
+	color: #be433c;
+	padding: 12px 13.5px;
+	background-color: #f5ba44;
+	border-radius: 50%;
+	border: 1px solid #be433c;
+	cursor: pointer;
+	position: absolute;
+	left: 10px;
+	top: 39px;
+}
+
+#toggleMenuButton:hover {
+	filter: brightness(120%);
+}
+
+.menuIn {
+  animation-name: animateMenuIn;
+  animation-duration: 500ms;
+  animation-timing-function: ease-out;
+}
+
+.menuOut {
+  animation-name: animateMenuOut;
+  animation-duration: 350ms;
+  animation-timing-function: ease-in;
+}
+
+@keyframes animateMenuIn {
+	from {
+    left: -100%;
+  }
+
+  to {
+    left: 0;
+  }
+}
+
+@keyframes animateMenuOut {
+	from {
+    left: 0;
+  }
+
+  to {
+    left: -100%;
+  }
 }

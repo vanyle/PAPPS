@@ -14,20 +14,30 @@
 <body>
 	<header>
 		<img src="media/paps.png" alt="Logo de PAPS" width="100px">
-		<nav></nav>
+		<i id="toggleMenuButton" class="fa fa-bars"></i>
+		<div id="headerMenu">
+			<div id="sandwichButtonContainer">
+				<i id="toggleMenuButtonInsideSandwich" class="fa fa-bars"></i>
+			</div>
+			<nav></nav>
+		</div>
 	</header>
 	<div id="content">
 		<div class='home block'>
 			<h1>PAPS'APP</h1>
 			<h2>C'est quoi ce site ?</h2>
 			<p>Une courte présentation du site se trouve ici</p>
-
-			<button class="connect">Connecte toi avec ton compte VR pour essayer !</button>
+			<div class="buttonContainer">
+				<button class="connect">Connecte toi avec ton compte VR pour essayer !</button>
+			</div>
 
 		</div>
 
 		<div class='browse block'>
-			<input type="text" id="recipe_search_dom" placeholder="Cherche une recette"/>
+			<div id="recipe_search_container">
+				<input type="text" id="recipe_search_dom" placeholder="Chercher une recette"/>
+				<i class="fa fa-search recipe-search-icon"></i>
+			</div>
 			<div id="recipe-list-container" class="list-container"></div>
 		</div>
 
@@ -88,7 +98,7 @@
 							<span class="recipe-info-author"><a class='recipe-author' href="http://linkcs.fr" data-username=""></a><span class='recipe-time'></span></span>
 							<div id="recipe-star-rating-container"></div>
 						</div>
-						<p class="recipe-description">Description</p>						
+						<p class="recipe-description">Description</p>
 					</div>
 					<div class="recipe-ingredients recipe-part">
 						<span class="recipe-ingredients-title">Ingrédients</span>
@@ -132,6 +142,10 @@
 				</form>
 			</div>
 		</div>
+	</div>
+
+	<div id="notification-container">
+
 	</div>
 
 <script src="https://kit.fontawesome.com/a0b8c55906.js" crossorigin="anonymous"></script>

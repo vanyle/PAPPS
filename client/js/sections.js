@@ -218,7 +218,7 @@ function displaySection(section_name){
 	// Show the right section
 	let toShow = document.getElementsByClassName(section_name);
 	for(let j = 0;j < toShow.length;j++){
-		toShow[j].style.display = 'block';
+		toShow[j].style.display = 'flex';
 	}
 	location.hash= '#' + section_name;
 

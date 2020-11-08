@@ -52,7 +52,7 @@ img[src]::after {
 
 .recipe-description {
   /*text-align: justify;*/ /*Might produce weird spacing between word with 2 line descriptions*/
-  text-indent: 40px;
+  /*text-indent: 40px;*/
 }
 
 
