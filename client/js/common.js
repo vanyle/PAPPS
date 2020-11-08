@@ -85,7 +85,11 @@ async function build_header(){
 	}
 }
 
-function notify(message) {
+
+// -----------------------------------------------------
+// This function displays messages in an alert style way but less aggresivly.
+// It supports HTML styling and requires no CSS. It's standalone and very useful!
+function toast(message) {
   var elem = document.createElement("div");
 
   elem.innerHTML = message;

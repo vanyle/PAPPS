@@ -112,13 +112,6 @@ async function delete_comment(recipeId,commentId){
 }
 
 // -----------------------------------------------------
-// This function displays messages in an alert style way but less aggresivly.
-// It supports HTML styling and requires no CSS. It's standalone and very useful!
-function toast(msg){
-	alert(msg);
-}
-
-// -----------------------------------------------------
 // This function converts non-safe strings (that might include tags) into pretty formatted string.
 // Format rules:
 // @name -> name of the user if he is connected, "Toi" otherwire
