@@ -31,6 +31,7 @@
 				</div>
 			</div>
 			<p class="recipe-description">Recette non disponible.</p>
+			<div id="delete_recipe_box">Supprimer la recette: <button class='small' id="delete_recipe_button"><i class='fa fa-trash'></i></button></div>
 		</div>
 
 		<div class="recipe-ingredients recipe-part">
@@ -115,8 +116,6 @@
 			htmlToAdd += '<span class="comment-username">' + text_formatter(comment.name) + '</span>';
 			htmlToAdd += '<span class="comment-date">';
 
-			console.log(comment);
-
 			if(auth && (comment.user_id === auth.id || auth.rights.indexOf('delete_comment') !== -1)){
 				htmlToAdd += "<button class='delete_comment_button small' data-cid='" + comment.id + "'><i class='fa fa-trash'></i></button>";
 			}
@@ -168,15 +167,11 @@
 		}
 
 		function displayRecipe(title, author, image_id, date, rating, tags, description, ingredients, steps, comments) {
-			console.log(title, author, date, rating, description, ingredients, steps, comments);
-
 			setRecipeTitle(title);
 			setRecipeAuthor(author);
 			setRecipeDescription(description);
 			setRecipeTime(date);
 			setRecipeImage(image_id);
-
-			console.log(rating);
 
 			StarRate.setRating(rating/5);
 
@@ -219,7 +214,7 @@
 			// manage comment writing:
 			publish_dom.style.display = 'none';
 			comment_preview_dom.style.display = 'none';
-			comment_dom.addEventListener('keyup',() => {
+			comment_dom.onkeyup = () => {
 				formated_comment.innerHTML = text_formatter(comment_dom.value);
 				if(comment_dom.value.length > 0){
 					publish_dom.style.display = '';
@@ -228,8 +223,8 @@
 					comment_preview_dom.style.display = 'none';
 					publish_dom.style.display = 'none';
 				}
-			});
-			publish_dom.addEventListener('click',async (e) => {
+			};
+			publish_dom.onclick = async (e) => {
 				e.preventDefault();
 				let comment_content = comment_dom.value;
 				let res = await post_comment(id,comment_content);
@@ -239,20 +234,34 @@
 					comment_dom.value = "";
 					toast("Impossible de poster le commentaire.");
 				}
-			});
+			};
 			document.querySelectorAll(".delete_comment_button").forEach((button) => {
-				button.addEventListener('click',async function(){
+				button.onclick = async function(){
 					let cid = this.getAttribute('data-cid');
-					console.log(cid);
 					let res = await delete_comment(id,cid);
-					console.log(res);
 					if(res){
 						location.reload();
 					}else{
 						toast("Impossible supprimer le commentaire.");
 					}
-				});
-			})
+				};
+			});
+
+			// add delete button if the user is allowed to delete the recipe.
+			if(auth && (id === auth.id || auth.rights.indexOf('delete_recipe') !== -1)){
+				delete_recipe_box.style.display = '';
+				delete_recipe_button.onclick = async () => {
+					console.log("awaiting removal.");
+					let result = await delete_recipe(id);
+					if(!result){
+						toast("Impossible de supprimer la recette.");
+					}else{
+						location.href = "/#browse";
+					}
+				}
+			}else{
+				delete_recipe_box.style.display = 'none';
+			}
 
 
 		}

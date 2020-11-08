@@ -25,6 +25,29 @@ function seeded_pick(arr){
 }
 
 
+async function addImageToDB(r){
+	// load images from doc with format doc/img*.jpg
+
+	let image_paths = fs.readdirSync('doc');
+	let valid_image_path = [];
+	for(let i = 0;i < image_paths.length;i++){
+		if(image_paths[i].endsWith('jpg') && image_paths[i].startsWith('img')){
+			valid_image_path.push(image_paths[i]);
+		}
+	}
+	// pick a random path
+	let full_path = path.join("./doc",seeded_pick(valid_image_path));
+	let img_data = fs.readFileSync(full_path);
+	// here, data is binary
+	try{
+		let res = await r.table('images').insert({data:img_data});
+		return res.generated_keys[0];
+	}catch(err){
+		console.log(err.message);
+		return false;
+	}
+}
+
 // Warning, this function override the content of the database !
 module.exports.populate_db = async (r) => {
 
@@ -35,24 +58,6 @@ module.exports.populate_db = async (r) => {
 	await rw.createTable("images",r);
 
 	let image_count = 0;
-
-	// load images from doc with format doc/img*.jpg
-
-	let image_paths = fs.readdirSync('doc');
-	for(let i = 0;i < image_paths.length;i++){
-		if(image_paths[i].endsWith('jpg') && image_paths[i].startsWith('img')){
-			let full_path = path.join("./doc",image_paths[i]);
-			let img_data = fs.readFileSync(full_path);
-			// here, data is binary
-			try{
-				let res = await r.table('images').insert({data:img_data});
-				image_count++;
-			}catch(err){
-				console.log(err.message);
-			}
-		}
-	}
-	console.log("Generated "+image_count + " images");
 
 	// ----------------------------------------------------------
 	// user related
@@ -148,7 +153,7 @@ module.exports.populate_db = async (r) => {
 					return;
 				}
 
-				let image_id = (await r.table('images').sample(1).run())[0].id;
+				let image_id = await addImageToDB(r);
 
 				let result = await rw.create_recipe(one_user[0].id,name,desc,tags,ingredients,steps,image_id,r);
 

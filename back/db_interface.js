@@ -211,6 +211,11 @@ module.exports.create_recipe = async (user_id,title,description,tags,ingredients
 				return;
 			}
 
+			if(typeof image_id !== "string"){
+				resolve({error:"bad image id"});
+				return;
+			}
+
 			let is_image = r.table("images").get(image_id).run();
 			if(is_image === null){
 				resolve({error:"no image with the given id exists"})
@@ -248,6 +253,10 @@ module.exports.delete_recipe = (user_id,recipe_id,r) => {
 				resolve({error:"no user with the given id exists"});
 				return;
 			}
+			if(typeof recipe_id !== "string"){
+				resolve({error:"bad recipe id"});
+				return;
+			}
 			r.table("recipes").get(recipe_id).run((err,recipe) => {
 				if(recipe === null){
 					resolve({error:"no recipe with the given id exists"});
@@ -261,6 +270,12 @@ module.exports.delete_recipe = (user_id,recipe_id,r) => {
 				}
 
 				// TODO: delete images associated with recipe ?
+				r.table("images").get(recipe.image_id).delete().run((err,result) => {
+					if(err !== null){
+						console.log("Unable to remove image: "+recipe.image_id+" associated with "+recipe);
+						console.log(err.message);
+					}
+				});
 
 				r.table("recipes").get(recipe_id).delete().run((err,result) => {
 					if(err !== null){
@@ -478,33 +493,42 @@ module.exports.retreive_recipes = (tags,search,r) => {
 module.exports.retreive_recipe_by_id = (id,r) => {
 	return new Promise((resolve) => {
 		let query = r.table("recipes");
+
 		query = query.get(id).merge(function(rec){return {rating:rec('rating').avg('note').default(2.5)}});
 
-		query.run((err,result) => {
-			if(err != null){
-				console.log(err.message);
-		    	resolve({error:"unable to retreive db results, please retry",result:null});
-		    	return;
-			}
-			if(result === null){
-				resolve({error:"no recipe with the given id exists"});
-				return;
-			}
-			let toreturn = {}; // field filter. This is performed on a single object, so it's not costly.
-			toreturn.id = result.id;
-			toreturn.image_id = result.image_id;
-			toreturn.title = result.title;
-			toreturn.description = result.description;
-			toreturn.rating = result.rating;
-			toreturn.tags = result.tags;
-			toreturn.ingredients = result.ingredients;
-			toreturn.steps = result.steps;
-			toreturn.creator_id = result.creator_id;
-			toreturn.comments = result.comments;
-			toreturn.creation_time = result.creation_time;
+		try{
 
-			resolve({error:null,result:toreturn});
-		});
+			query.run((err,result) => {
+				if(err != null){
+					console.log(err.message);
+			    	resolve({error:"unable to retreive db results, please retry",result:null});
+			    	return;
+				}
+				if(result === null){
+					resolve({error:"no recipe with the given id exists"});
+					return;
+				}
+				let toreturn = {}; // field filter. This is performed on a single object, so it's not costly.
+				toreturn.id = result.id;
+				toreturn.image_id = result.image_id;
+				toreturn.title = result.title;
+				toreturn.description = result.description;
+				toreturn.rating = result.rating;
+				toreturn.tags = result.tags;
+				toreturn.ingredients = result.ingredients;
+				toreturn.steps = result.steps;
+				toreturn.creator_id = result.creator_id;
+				toreturn.comments = result.comments;
+				toreturn.creation_time = result.creation_time;
+
+				resolve({error:null,result:toreturn});
+			});
+
+		}catch(err){
+			// error because merge function operates on null object if id is unvalid.
+			// this is nothing to worry about.
+			resolve({error:"no recipe with the given id exists"});
+		}
 	});
 }
 module.exports.retreive_user_by_id = (id,r) => {

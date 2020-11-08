@@ -92,7 +92,7 @@ Affiche la liste des utilisateurs du site, leur id, et si ils sont connectés.
 
 -------
 
-`log <on/off>` (Pas implémenté)
+`logs <on/off>`
 
 Active ou désactive les logs. Permet d'afficher ce que les utilisateurs font dans la console.
 
@@ -161,6 +161,10 @@ En général, utilisez la commande ci-dessous pour savoir quels applications uti
 ```bash
 netstat -ltnp | grep -w ':80' # Remplacez 80 par le numéro du port qui pose problème 
 ```
+
+### `ReqlOpFailedError: Cannot perform read: primary replica for shard ["", +inf) not available in:`
+
+La base de donnée n'est pas encore prête mais vous avez essayer d'écrire ou de lire dedans. Cette erreur n'est pas grave, réessayer ce que vous aviez fait en attendant 1 seconde et ça devrait marcher. Si après 5 secondes d'attente, l'erreur est encore là, ce n'est pas normal (ce n'est jamais arrivé). Je conseillerais de relancer le serveur.
 
 ### Faire marcher le HTTPS
 
