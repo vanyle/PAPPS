@@ -428,6 +428,7 @@ option{
 @media screen and (max-width: 600px) {
 	header {
 		position: static;
+		border: none;
 	}
 
 	#headerMenu {
