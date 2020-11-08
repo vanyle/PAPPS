@@ -51,6 +51,8 @@ function process_file_content(content,basepath){
 
 	for(let i = 0;i < content.length;i++){
 		if(content.substring(i,i + tomatch.length) === tomatch){
+			console.log("MATCH.");
+
 			i += tomatch.length;
 			include_start_index = i;
 			while(content[i] !== '}') i++;
@@ -97,7 +99,12 @@ function start_webserver(){
 	});
 
 	app.use('/',(req,res,next) => {
-		let file_path =  path.join('./client',path.normalize(req.path));
+		let rpath = req.path;
+		if(rpath === '/'){
+			rpath = '/index.html';
+		}
+
+		let file_path =  path.join('./client',path.normalize(rpath));
 
 		if(fs.existsSync(file_path) && fs.lstatSync(file_path).isFile()){
 			// use proprocessing on these 4 file types.
@@ -126,10 +133,6 @@ function start_webserver(){
 		next();
 	});
 	app.use(express.raw({type: '*/*',limit: '2000kb',})); // to retreive bodies of post requests, with 2 Mo limit for image uploads (Most images are under 1 Mo)
-
-	app.get('/',(req,res) => {
-		res.sendFile(__dirname + "/client/index.html");
-	});
 
 
 	const RED_COLOR_CODE = "\u001b[31m";
