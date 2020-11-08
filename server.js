@@ -44,6 +44,34 @@ database.setup(config, (r) => {
 	start_webserver();
 });
 
+function process_file_content(content,basepath){
+	let tomatch = "@include{";
+	let include_start_index = 0;
+	let include_stop_index = 0;
+
+	for(let i = 0;i < content.length;i++){
+		if(content.substring(i,i + tomatch.length) === tomatch){
+			i += tomatch.length;
+			include_start_index = i;
+			while(content[i] !== '}') i++;
+			include_stop_index = i;
+
+			// perform substitution.
+			let file_path = path.join(basepath,content.substring(include_start_index,include_stop_index));
+			try{
+				let substitution = fs.readFileSync(file_path);
+				content = content.substring(0,include_start_index - tomatch.length) + substitution + content.substring(include_stop_index+1);
+				i = include_start_index - tomatch.length;
+			}catch(err){
+				console.log("Warning, substitution failed in process_file_content: ");
+				console.log(err.message);
+			}
+		}
+	}
+	return content;
+}
+
+
 function start_webserver(){
 
 	// Setup app
@@ -61,18 +89,46 @@ function start_webserver(){
 		}
 	}));
 
-	app.use('/',express.static('client'));
-	app.use(express.raw({type: '*/*',limit: '2000kb',})); // to retreive bodies of post requests, with 2 Mo limit for image uploads (Most images are under 1 Mo)
-
-	app.get('/',(req,res) => {
-		res.sendFile(__dirname + "/client/index.html");
-	});
-
 	app.get('/q',async (req,res) => {
 		database.handle_query(req,res);
 	});
 	app.post('/q',async (req,res) => {
 		database.handle_post_query(req,res);
+	});
+
+	app.use('/',(req,res,next) => {
+		let file_path =  path.join('./client',path.normalize(req.path));
+
+		if(fs.existsSync(file_path) && fs.lstatSync(file_path).isFile()){
+			// use proprocessing on these 4 file types.
+			if(file_path.endsWith('.html') || file_path.endsWith('.js') || file_path.endsWith('.css')){
+					if(file_path.endsWith('.css')){
+						res.writeHead(200, {
+    						'Content-Type': 'text/css'
+  						});
+					}
+					let content = fs.readFileSync(file_path,'utf8');
+					res.write(process_file_content(content,"./client/"));
+					res.end();
+				}else{
+					// send raw files of arbitrary size.
+					let file_read_stream = fs.createReadStream(file_path);
+					file_read_stream.on('data',(chunk) => {
+						res.write(chunk);
+					})
+					file_read_stream.on('end',() => {
+						res.end();
+					})
+				}
+			return;
+		}
+
+		next();
+	});
+	app.use(express.raw({type: '*/*',limit: '2000kb',})); // to retreive bodies of post requests, with 2 Mo limit for image uploads (Most images are under 1 Mo)
+
+	app.get('/',(req,res) => {
+		res.sendFile(__dirname + "/client/index.html");
 	});
 
 
