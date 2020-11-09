@@ -51,8 +51,6 @@ function process_file_content(content,basepath){
 
 	for(let i = 0;i < content.length;i++){
 		if(content.substring(i,i + tomatch.length) === tomatch){
-			console.log("MATCH.");
-
 			i += tomatch.length;
 			include_start_index = i;
 			while(content[i] !== '}') i++;
