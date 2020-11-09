@@ -207,7 +207,7 @@ textarea{
 	border-radius: 15px;
 	padding: 8px 20px;
 	margin:20px;
-	font-family: Aller;
+	font-family: AllerRegular;
 }
 /* Text formatting styles */
 pre{
@@ -277,6 +277,10 @@ b{
     -webkit-transform: translateY(-15px);
     transform: translateY(-15px);
   }
+}
+
+#formatted_comment, #comment_preview_dom {
+	font-family: AllerRegular;
 }
 
 /* Related to the create recipe section */
