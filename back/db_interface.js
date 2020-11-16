@@ -60,21 +60,21 @@ module.exports.make_salt = () => {
 module.exports.createTable = async (tableName,r) => {
 	return new Promise((resolve) => {
 		r.tableCreate(tableName).run(function(err, result) {
-	    	resolve({err:err,result:result});
+	    	resolve({error:err,result:result});
 		});
 	});
 }
 module.exports.deleteTable = async (tableName,r) => {
 	return new Promise((resolve) => {
 		r.tableDrop(tableName).run(function(err, result) {
-	    	resolve({err:err,result:result});
+	    	resolve({error:err,result:result});
 		});
 	});
 };
 module.exports.listTable = async (r) => {
 	return new Promise((resolve) => {
 		r.tableList().run((err,result) => {
-			resolve({err:err,result:result});
+			resolve({error:err,result:result});
 		});
 	});
 };
@@ -448,7 +448,7 @@ module.exports.retreive_recipes = (tags,search,r) => {
 		if(tags instanceof Array && tags.length >= 1 && tags.length <= 6){
 			for(let i = 0;i < tags.length;i++){
 				if(typeof tags[i] !== "string" || tags[i].length == 0 || tags[i].length > 50){
-					resolve({err:"bad tag",result:null});
+					resolve({error:"bad tag",result:null});
 					return;
 				}
 			}
@@ -462,7 +462,7 @@ module.exports.retreive_recipes = (tags,search,r) => {
 		// search by query (s field in request)
 		if(typeof search === "string" && search.length >= 1){
 			if(search.length > 100){
-				resolve({err:"query too long",result:null});
+				resolve({error:"query too long",result:null});
 				return;
 			}
 			search = search.toLowerCase(); // lowercase match.
@@ -531,6 +531,48 @@ module.exports.retreive_recipe_by_id = (id,r) => {
 		}
 	});
 }
+module.exports.add_item_in_shopping_list = (user_id,item,r) => {
+	return new Promise((resolve) => {
+		r.table("users").get(user_id).run((err,user) => {
+			if(user === null){
+				resolve({error:"no user with the given id exists"});
+				return;
+			}
+			if(typeof item !== "string" || item.length <= 0 || item.length >= 500){
+				resolve({error:"bad item",result:null});
+				return;
+			}
+			if(user.shopping_lists.length >= 300){
+				resolve({error:"your shopping list is full, you can't add more items to it."});
+				return;
+			}
+
+			r.table("users").get(user_id).update({shopping_lists: r.row("shopping_lists").append(item)}).run((error,result) => {
+				resolve({result})
+			});
+		});
+	});
+}
+module.exports.remove_item_in_shopping_list = (user_id,id,r) => {
+	return new Promise((resolve) => {
+		r.table("users").get(user_id).run((err,user) => {
+			if(user === null){
+				resolve({error:"no user with the given id exists"});
+				return;
+			}
+			id = parseInt(id);
+			if(isNaN(id) || id < 0 || id >= user.shopping_lists.length){
+				resolve({error:"bad id",result:null});
+				return;
+			}
+
+			r.table("users").get(user_id).update({shopping_lists: r.row("shopping_lists").deleteAt(id)}).run((error,result) => {
+				resolve({result});
+			});
+		});
+	});
+}
+
 module.exports.retreive_user_by_id = (id,r) => {
 	return new Promise((resolve) => {
 		let query = r.table("users");

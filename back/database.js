@@ -456,6 +456,18 @@ module.exports.handle_post_query = async (req,res) => {
 			return;
 		}
 		send_response(res,await rw.delete_comment(req.session.user_id,id,cid,rethinkdb));
+	}else if(req.query.type === "add_shop_list"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+		send_response(res,await rw.add_item_in_shopping_list(req.session.user_id,req.query.item,rethinkdb));
+	}else if(req.query.type === "remove_shop_list"){
+		if(!req.session.co){
+			send_error(res,"you need to be logged in to perform this request");
+			return;
+		}
+		send_response(res,await rw.remove_item_in_shopping_list(req.session.user_id,req.query.id,rethinkdb));
 	}else if(req.query.type === "rate"){
 		if(!req.session.co){
 			send_error(res,"you need to be logged in to perform this request");

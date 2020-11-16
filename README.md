@@ -222,7 +222,7 @@ Format de la réponse:
 	"id":"id",
 	"title":"title",
 	"description":"description",
-     "image_id":"imageid
+     "image_id":"imageid"
 	"rating":4, // 0 - 5
 	"tags":["tag1","tag2"],
 },{...}, ...]
@@ -369,6 +369,22 @@ POST `/q?type=rate&id=id&rate=rate`
 Permet à un utilisateur de noter une recette. id est l'id de la recette à noter. rate est un nombre entre 0 et 5 inclus correspondant à la note donnée par l'utilisateur. Si l'utilisateur a déjà noté la recette, cette url modifiera la note précédente.
 
 Retourne: `{msg:OK}` en cas de succès
+
+
+------
+
+POST `/q?type=add_shop_list&item=item` (Pas implémenté)
+
+Ajoute `item` à la liste de courses de l'utilisateur. `item` est une chaine de caractère quelconque de longueur inférieure à 500 caractères.
+La liste de course d'un utilisateur ne peut contenir que 300 éléments au maximum.
+
+Rappel: `/q?type=uinfo` récupère les listes de courses de l'utilisateur.
+
+------
+
+POST `/q?type=remove_shop_list&id=id` (Pas implémenté)
+
+Retire le `id`-ième élément de la liste de course de l'utilisateur. `id` est un entier positif.
 
 ------
 
