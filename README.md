@@ -373,7 +373,7 @@ Retourne: `{msg:OK}` en cas de succès
 
 ------
 
-POST `/q?type=add_shop_list&item=item` (Pas implémenté)
+POST `/q?type=add_shop_list&item=item`
 
 Ajoute `item` à la liste de courses de l'utilisateur. `item` est une chaine de caractère quelconque de longueur inférieure à 500 caractères.
 La liste de course d'un utilisateur ne peut contenir que 300 éléments au maximum.
@@ -382,7 +382,7 @@ Rappel: `/q?type=uinfo` récupère les listes de courses de l'utilisateur.
 
 ------
 
-POST `/q?type=remove_shop_list&id=id` (Pas implémenté)
+POST `/q?type=remove_shop_list&id=id`
 
 Retire le `id`-ième élément de la liste de course de l'utilisateur. `id` est un entier positif.
 
